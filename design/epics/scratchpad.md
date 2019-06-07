@@ -9,6 +9,18 @@ We happen to have 3 **types of users**:
 2. Optician
 3. Visitor
 
+At a base level, a user ha s the following properties:
+1. Display Name
+2. Username
+3. Password
+4. Email
+5. Tel. Number (optional)
+6. Profile Pic (optional)
+7. Introducer (optional)
+
+Visitors have this additional properties:
+1. Supported Cities
+
 ## Goal
 The goal of this system is to let distributors (and visitors on behalf of distributos(?)) to put their **catalog of frames** on the platform. Then, other distributors, opticians and visitors -a.k.a. users- can see their catalogue. The whole model or only its price can only be seen by **permitted** users which are specified in the form of **followers**.
 
