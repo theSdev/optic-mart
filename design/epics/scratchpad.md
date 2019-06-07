@@ -45,7 +45,7 @@ Speaking of availability, let's talk about **frames' properties**:
 1. UV
 2. Polarized
 
-Aside from this core scenario, there are two other feature packages that can be added to the platform.
+Aside from this core scenario, there are some other feature packages that can be added to the platform.
 
 # Reporting  
 With all this data in hand, various potentially useful reports can be generated and be offered to the users. Some examples are:
@@ -56,3 +56,6 @@ With all this data in hand, various potentially useful reports can be generated 
 
 # Visitor Companion
 For the road warriors, Optic Mart offers a companion in the form of a **map** on which Opticians can be found. Upon click on an Optician's icon on the map, an **info card** containing general info about them plus their recent purchase history is shown to the user.
+
+# Blog
+Distributors and visitors will have a blog section on their profile so they can share new developments in the field interesting to them with other users on the platform. This blog has to provide a title field in addition to a WYSIWYG editor for creating new posts.
