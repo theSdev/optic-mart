@@ -1,6 +1,6 @@
-# View Frame by URL  
+# View Frames Individually  
 ## Definition  
-A frame can be viewed by visiting a page with a unique specified URL if the privacy criteria is met.  
+A frame can be viewed individually by users and non-users if the privacy criteria is met.  
 
 ## Additional Info  
 A frame owner can mark certain frames or only their prices as private (./markframeasprivate.md).  
