@@ -18,7 +18,7 @@ Sunglasses may also include following additional properties:
 2. Polarized
 
 ## Aditional Info  
-Created frames can be viewed collectively by the owner (./viewframescollectivelybytheowner.md) or individually by unique URL (./viewframebyurl.md). They can also be viewed by other user or non-users if the privacy criteria is met (./viewframecollectionbyothers.md).  
+Created frames can be viewed collectively by the owner (./viewframescollectivelybytheowner.md) or individually by unique URL (./viewframesindividually.md). They can also be viewed by other user or non-users if the privacy criteria is met (./viewframecollectionbyothers.md).  
 A frame can be marked as completely private or price private (./markframeasprivate.md).  
 A frame owner can modify their frames one at a time (./modifyframe.md).  
 A frame owner can delete their frames one at a time (./deleteframe.md) or collectively (./deleteagroupofframes.md).  
