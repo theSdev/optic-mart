@@ -14,3 +14,6 @@ Visitors have these additional properties:
 
 ## Additional Info  
 Users can login to the site (./login.md).  
+User profiles can be viewed individually (./viewuser.md).  
+Users can modify their info (./modifyuser.md).  
+Users can delete their accounts (./deleteuser.md).  
