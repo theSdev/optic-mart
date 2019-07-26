@@ -1,6 +1,5 @@
-# Get Notification For Frame Activity  
-## Definition  
-A follower can get notifications whenever their followees create a new frame or modify one.
+# Name
+Get Notification For Frame Activity  
 
-## Additional Info  
-A follower can choose followees to get notifications from when they create or modify a frame (./selectfolloweestogetframeactivitynotificationsfrom.md).  
+# Acceptance Criteria
+A follower can get notifications whenever their followees create a new frame or modify one.  

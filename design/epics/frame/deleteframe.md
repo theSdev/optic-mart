@@ -1,6 +1,5 @@
-# Delete Frame  
-## Definition  
-A frame owner can delete their frames one at a time.  
+# Name
+Delete Frame  
 
-## Additional Info  
-A distributor or visitior on behalf of distributor can create frames (./createframe.md).  
+# Acceptance Criteria
+A frame owner can delete their frames one at a time.  

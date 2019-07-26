@@ -1,3 +1,5 @@
-# Modify User  
-## Definition  
+# Name
+Modify User  
+
+# Acceptance Criteria
 Users can modify their info.  

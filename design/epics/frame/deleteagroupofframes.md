@@ -1,6 +1,5 @@
-# Delete Frame  
-## Definition  
-A frame owner can delete their frames collectively by selecting a group of them and choosing the delete action.  
+# Name
+Delete a Group of Frames  
 
-## Additional Info  
-A distributor or visitior on behalf of distributor can create frames (./createframe.md).  
+# Acceptance Criteria
+A frame owner can delete their frames collectively by selecting a group of them and choosing the delete action.  

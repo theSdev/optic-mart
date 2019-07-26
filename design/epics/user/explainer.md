@@ -1,0 +1,6 @@
+- People new to the site can register as a user (./registeruser.md).  
+- Users can login to the site (./login.md).  
+- User profiles can be viewed individually (./viewuser.md).  
+- Users can modify their info (./modifyuser.md).  
+- Users can delete their accounts (./deleteuser.md).  
+- Users can search for other users on the platform (./searchforuser.md).  

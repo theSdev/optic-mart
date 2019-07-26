@@ -1,6 +1,5 @@
-# Unfollow  
-## Definition  
-A follower can unfollow users they have followed (./unfollow.md).  
+# Name
+Unfollow  
 
-## Additional Info  
-User can follow other distributors or visitors on the platform. (./follow.md).  
+# Acceptance Criteria
+A follower can unfollow users they have followed.  

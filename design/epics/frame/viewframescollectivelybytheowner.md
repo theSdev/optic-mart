@@ -1,6 +1,5 @@
-# View Frames Collectively by The Owner  
-## Definition  
-A frames' owner can view a list of frames created by them with controls to modify or remove them.  
+# Name
+View Frames Collectively by The Owner  
 
-## Additional Info  
-A distributor or visitior on behalf of distributor can create frames (./createframe.md).  
+# Acceptance Criteria
+A frames' owner can view a list of frames created by them with controls to modify or remove them.  

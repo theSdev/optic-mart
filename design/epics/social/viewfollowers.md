@@ -1,6 +1,5 @@
-# View Followers  
-## Definition  
-Users can view the list of their followers.  
+# Name
+View Followers  
 
-## Additional Information
-User can follow other distributors or visitors on the platform. (./follow.md).  
+# Acceptance Criteria
+Users can view the list of their followers.  

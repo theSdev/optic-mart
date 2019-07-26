@@ -1,0 +1,9 @@
+- Frame owners can permit other users to see private material created by them on the platform (./premituser.md).  
+- Permissions can be revoked from a dedicated form accessed be the granter's dashboard (./revokepermission.md).  
+- A user can (if configured) get notifications from the followee upon certain actions such as new frame creation or modification (./getnotificationforframeactivity.md).  
+- A follower can ask for permission to access private models and prices on the followee's page (./askforpermission.md).  
+- A follower can see a list of who they followed (./viewfollowees.md).  
+- A followee can see a list of their followers (./viewfollowers.md).  
+- Users can follow other distributors or visitors on the platform. (./follow.md).  
+- A follower can unfollow users they have followed (./unfollow.md).  
+- A follower can choose followees to get notifications from when they create or modify a frame (./selectfolloweestogetframeactivitynotificationsfrom.md).  
