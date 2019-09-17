@@ -11,7 +11,7 @@ fn main() {
 		App::new()
 			.route("/", web::post().to_async(user::register))
 	})
-		.bind("127.0.0.1:8090")
+		.bind("0.0.0.0:8090")
 		.unwrap()
 		.run()
 		.unwrap();
