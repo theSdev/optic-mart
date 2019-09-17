@@ -52,7 +52,7 @@ pub fn register(user_model: web::Json<UserModel>) -> impl Future<Item = impl Res
 	
 	web::block(move ||{
 		reqwest::Client::new()
-			.post("http://127.0.0.1:2113/streams/user")
+			.post("http://0.0.0.0:2113/streams/user")
 			.header("Content-Type", "application/json")
 			.header("ES-CurrentVersion", "-2")
 			.header("ES-EventId", event.event_id)
