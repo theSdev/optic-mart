@@ -8,5 +8,9 @@ edition = "2018"
 
 [dependencies]
 actix-web = "1.0"
-"rdkafka" = "~0.21"
+uuid = { version = "0.7", features = ["v4"] }
+bcrypt = "0.5"
+serde = "1.0"
+serde_json = "1.0"
+reqwest = "0.9"
 "futures" = "0.1.28"
