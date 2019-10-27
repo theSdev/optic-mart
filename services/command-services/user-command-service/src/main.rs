@@ -1,6 +1,7 @@
 use actix_web::{web, App, HttpServer};
 
 mod user;
+mod event;
 
 fn main() {
 	// "postgres://YourUserName:YourPassword@YourHost:5432/YourDatabase"
