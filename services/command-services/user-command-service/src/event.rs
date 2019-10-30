@@ -7,14 +7,14 @@ pub enum Event {
 }
 
 impl fmt::Display for Event {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
+	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+		write!(f, "{:?}", self)
+	}
 }
 
 pub enum ExpectedVersion {
-	StreamShouldExistButEmpty = 0,
+	//	StreamShouldExistButEmpty = 0,
 	StreamShouldNotExist = -1,
-	WriteShouldAlwaysSucceed = -2,
-	StreamShouldExist = -4,
+	//	WriteShouldAlwaysSucceed = -2,
+	//	StreamShouldExist = -4,
 }
