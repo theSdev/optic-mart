@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 
 mod event;
@@ -8,9 +9,13 @@ fn main() {
 	// let con_str = "postgres://postgres:s1031374@localhost:5432/optic_mart";
 	println!("Listening on localhost:8090");
 
-	HttpServer::new(|| App::new().route("/", web::post().to_async(user::register)))
-		.bind("0.0.0.0:8090")
-		.unwrap()
-		.run()
-		.unwrap();
+	HttpServer::new(|| {
+		App::new()
+			.wrap(Cors::new())
+			.route("/", web::post().to_async(user::register))
+	})
+	.bind("0.0.0.0:8090")
+	.unwrap()
+	.run()
+	.unwrap();
 }

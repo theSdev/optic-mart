@@ -39,8 +39,8 @@ impl TryFrom<WebModel> for UserRegisteredData {
 			User::validate_field_str("phone_number", phone_number)?;
 		}
 
-		User::validate_field_str("username", user_model.name.as_str())?;
-		User::validate_field_str("email", user_model.name.as_str())?;
+		User::validate_field_str("username", user_model.username.as_str())?;
+		User::validate_field_str("email", user_model.email.as_str())?;
 
 		Ok(Self {
 			name: user_model.name,

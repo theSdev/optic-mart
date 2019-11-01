@@ -1,0 +1,41 @@
+{
+	"name": "user-web-client",
+	"version": "0.1.0",
+	"description": "Optic Mart's User Web Client",
+	"main": "index.js",
+	"config": {
+		"serviceAddress": "//127.0.0.1:8090"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/theSdev/optic-mart.git"
+	},
+	"keywords": [
+		"optic-mart",
+		"user"
+	],
+	"author": "thesdev <thesdev@outlook.com>",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/theSdev/optic-mart/issues"
+	},
+	"homepage": "https://github.com/theSdev/optic-mart#readme",
+	"devDependencies": {
+		"lit-element": "^2.2.1",
+		"rollup": "^1.26.2",
+		"rollup-plugin-copy": "^3.1.0",
+		"rollup-plugin-json": "^4.0.0",
+		"rollup-plugin-node-resolve": "^5.2.0",
+		"rollup-plugin-serve": "^1.0.1",
+		"rollup-plugin-terser": "^5.1.2",
+		"rollup-plugin-typescript2": "^0.24.3",
+		"typescript": "^3.6.4"
+	},
+	"prettier": {
+		"useTabs": true,
+		"trailingComma": "es5"
+	}
+}

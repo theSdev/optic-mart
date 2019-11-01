@@ -27,7 +27,7 @@ impl User {
 			"address" => Some(r"^\w{1,500}$"),
 			"phone_number" => Some(r"^[\d+]{4,20}$"),
 			"username" => Some(r"^\w{1,20}$"),
-			"email" => Some(r"^\w+@\w{2,}\.\w{2,}$"),
+			"email" => Some(r"^\w+@\w+\.\w{2,}$"),
 			_ => None,
 		}
 	}
@@ -47,3 +47,5 @@ impl User {
 		Ok(())
 	}
 }
+
+//#endregion
