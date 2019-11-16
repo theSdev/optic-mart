@@ -2,23 +2,21 @@ import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
 import { config } from "../../package.json";
 
-@customElement("user-register")
-export class UserRegister extends LitElement {
+@customElement("user-login")
+export class UserLogin extends LitElement {
 	@property({ type: Object }) model = {
-		name: "",
 		username: "",
 		password: "",
-		email: "",
 	};
 
 	static styles = [commonStyles, css``];
 
-	register(e: Event) {
+	login(e: Event) {
 		e.preventDefault();
-		fetch(`${config.serviceAddress}/users`, {
-			body: JSON.stringify(this.model),
+		fetch(`${config.serviceAddress}/users/${this.model.username}/tokens`, {
+			body: this.model.password,
 			headers: {
-				"Content-Type": "application/json",
+				"Content-Type": "text/plain",
 			},
 			method: "POST",
 		});
@@ -27,23 +25,12 @@ export class UserRegister extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>ثبت نام</h1>
+				<h1>ورود</h1>
 
-				<form @submit="${this.register}">
+				<form @submit="${this.login}">
 					<fieldset>
-						<legend>اطلاعات اولیه</legend>
+						<legend>اطلاعات حساب</legend>
 						<div>
-							<label>
-								نام
-								<input
-									@input="${(e: Event) =>
-										(this.model.name = (e.target as HTMLInputElement).value)}"
-									autocomplete="name"
-									pattern="^.{2,50}$"
-									required
-								/>
-							</label>
-
 							<label>
 								نام کاربری
 								<input
@@ -60,28 +47,21 @@ export class UserRegister extends LitElement {
 								<input
 									@input="${(e: Event) =>
 										(this.model.password = (e.target as HTMLInputElement).value)}"
-									autocomplete="new-password"
+									autocomplete="current-password"
 									required
 									type="password"
-								/>
-							</label>
-
-							<label>
-								ایمیل
-								<input
-									@input="${(e: Event) =>
-										(this.model.email = (e.target as HTMLInputElement).value)}"
-									autocomplete="email"
-									required
-									type="email"
 								/>
 							</label>
 						</div>
 					</fieldset>
 
 					<button type="submit">
-						<box-icon color="currentColor" name="user-plus"></box-icon>
-						ثبت نام
+						<box-icon
+							color="currentColor"
+							type="solid"
+							name="arrow-to-left"
+						></box-icon>
+						ورود
 					</button>
 				</form>
 			</article>

@@ -18,7 +18,7 @@ export default css`
 	}
 
 	a:hover {
-		text-decoration: underline dotted;
+		text-decoration: underline dashed;
 	}
 
 	a * {
@@ -34,7 +34,7 @@ export default css`
 
 	a box-icon,
 	button box-icon {
-		margin-left: 0.5em;
+		margin-left: 4px;
 	}
 
 	h1 {

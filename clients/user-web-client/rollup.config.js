@@ -35,11 +35,20 @@ const plugins = [
 
 export default [
 	{
+		input: "src/elements/user-login.ts",
+		output: {
+			file: "dist/elements/user-login.js",
+			format: "iife",
+			name: "UserLogin",
+		},
+		plugins,
+	},
+	{
 		input: "src/elements/user-register.ts",
 		output: {
 			file: "dist/elements/user-register.js",
 			format: "iife",
-			name: "UserModule",
+			name: "UserRegister",
 		},
 		plugins,
 	},

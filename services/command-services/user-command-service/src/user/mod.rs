@@ -1,9 +1,8 @@
 use chrono::prelude::*;
 use regex::Regex;
 
-mod register;
-pub use register::register;
-pub use register::UserRegisteredData;
+pub mod login;
+pub mod register;
 
 //#region User
 
@@ -23,8 +22,8 @@ pub struct User {
 impl User {
 	fn get_field_regex_pattern(field_name: &str) -> Option<&'static str> {
 		match field_name {
-			"name" => Some(r"^\w{2,50}$"),
-			"address" => Some(r"^\w{1,500}$"),
+			"name" => Some(r"^.{2,50}$"),
+			"address" => Some(r"^.{1,500}$"),
 			"phone_number" => Some(r"^[\d+]{4,20}$"),
 			"username" => Some(r"^\w{1,20}$"),
 			"email" => Some(r"^\w+@\w+\.\w{2,}$"),
@@ -38,7 +37,7 @@ impl User {
 		if let Some(pattern) = pattern {
 			if !Regex::new(pattern).unwrap().is_match(value) {
 				return Err(format!(
-					"Field '{}' is invalid. Expected pattern: {}",
+					"Field '{}' is invalid. Expected pattern: {}.",
 					field_name, pattern
 				));
 			}

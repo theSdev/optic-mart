@@ -1,10 +1,8 @@
-import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
+import { css, customElement, html, LitElement } from "lit-element";
 
 @customElement("shell-main")
 export class ShellMain extends LitElement {
-	@property() name = "World";
-
 	static styles = [
 		commonStyles,
 		css`
@@ -22,8 +20,11 @@ export class ShellMain extends LitElement {
 				border-top-right-radius: 0;
 			}
 
-			header a {
+			header nav {
 				margin-right: auto;
+				display: grid;
+				grid-auto-flow: column;
+				grid-gap: 12px;
 			}
 		`,
 	];
@@ -69,10 +70,20 @@ export class ShellMain extends LitElement {
 		return html`
 			<header class="primary">
 				<h1>اپتیک مارت</h1>
-				<a href="/user/register" data-element="user-register">
-					<box-icon color="currentColor" name="user-plus"></box-icon>
-					<span>ثبت نام</span>
-				</a>
+				<nav>
+					<a href="/user/register" data-element="user-login">
+						<box-icon
+							color="currentColor"
+							type="solid"
+							name="arrow-to-left"
+						></box-icon>
+						<span>ورود</span>
+					</a>
+					<a href="/user/register" data-element="user-register">
+						<box-icon color="currentColor" name="user-plus"></box-icon>
+						<span>ثبت نام</span>
+					</a>
+				</nav>
 			</header>
 			<main></main>
 		`;

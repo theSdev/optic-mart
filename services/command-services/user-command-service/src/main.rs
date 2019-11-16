@@ -1,20 +1,31 @@
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
-
+use config::Config;
 mod event;
+use std::collections::HashMap;
 mod user;
+mod utils;
+
+pub const ADDR: &str = "0.0.0.0:8080";
+lazy_static::lazy_static! {
+	static ref SECRETS: HashMap<String, String> = {
+		let mut config = Config::default();
+		config.merge(config::File::with_name("secrets")).unwrap();
+		config.try_into::<HashMap<String, String>>().unwrap()
+	};
+}
 
 fn main() {
-	// "postgres://YourUserName:YourPassword@YourHost:5432/YourDatabase"
-	// let con_str = "postgres://postgres:s1031374@localhost:5432/optic_mart";
-	println!("Listening on localhost:8090");
+	println!("Listening on {}", ADDR);
 
 	HttpServer::new(|| {
-		App::new()
-			.wrap(Cors::new())
-			.route("/", web::post().to_async(user::register))
+		App::new().wrap(Cors::new()).service(
+			web::scope("/users")
+				.route("", web::post().to(user::register::register))
+				.route("/{username}/tokens", web::post().to(user::login::login)),
+		)
 	})
-	.bind("0.0.0.0:8090")
+	.bind(ADDR)
 	.unwrap()
 	.run()
 	.unwrap();

@@ -9,11 +9,15 @@ edition = "2018"
 [dependencies]
 actix-cors = "0.1"
 actix-web = "1"
+async-std = "1"
 bcrypt = "0.5"
 chrono = { version = "0.4", features = ["serde"] }
-futures = "0.1"
+config = "0.9"
+jwt = { package = "jsonwebtoken", version = "6" }
+lazy_static = "1.4"
+postgres = "0.15"
 regex = "1"
-reqwest = "0.9"
 serde = "1"
 serde_json = "1"
+surf = "1"
 uuid = { version = "0.7", features = ["v4"] }

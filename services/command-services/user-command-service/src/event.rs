@@ -1,9 +1,9 @@
-use crate::user::UserRegisteredData;
 use std::fmt;
 
 #[derive(Debug, Clone)]
 pub enum Event {
-	UserRegistered(UserRegisteredData),
+	Login(crate::user::login::UserLoggedInData),
+	UserRegistered(crate::user::register::UserRegisteredData),
 }
 
 impl fmt::Display for Event {
@@ -13,8 +13,8 @@ impl fmt::Display for Event {
 }
 
 pub enum ExpectedVersion {
-	//	StreamShouldExistButEmpty = 0,
+	// StreamShouldExistButEmpty = 0,
 	StreamShouldNotExist = -1,
-	//	WriteShouldAlwaysSucceed = -2,
-	//	StreamShouldExist = -4,
+	// WriteShouldAlwaysSucceed = -2,
+	StreamShouldExist = -4,
 }
