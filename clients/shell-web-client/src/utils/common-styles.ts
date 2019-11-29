@@ -6,6 +6,12 @@ export default css`
 		font-family: inherit;
 	}
 
+	.outline-primary {
+		background-color: var(--fourth-color);
+		border: 1px solid var(--first-color);
+		color: var(--first-color);
+	}
+
 	.primary {
 		background-color: var(--first-color);
 		color: var(--fourth-color);
@@ -14,11 +20,7 @@ export default css`
 	a:link,
 	a:visited {
 		color: currentColor;
-		text-decoration: none;
-	}
-
-	a:hover {
-		text-decoration: underline dashed;
+		text-decoration: underline solid;
 	}
 
 	a * {
@@ -28,7 +30,7 @@ export default css`
 	a,
 	button {
 		align-items: center;
-		display: flex;
+		display: inline-flex;
 		justify-content: center;
 	}
 

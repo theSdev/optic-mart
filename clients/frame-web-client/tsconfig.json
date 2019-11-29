@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"target": "esnext",
+		"experimentalDecorators": true,
+		"lib": ["dom", "esnext"],
+		"module": "esnext",
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		"strict": true
+	},
+	"include": ["src/**/*"]
+}

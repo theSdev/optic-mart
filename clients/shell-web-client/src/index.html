@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 	<head>
-		<link rel="shortcut icon" href="assets/logo.png" type="image/png" />
+		<link rel="shortcut icon" href="/assets/logo.png" type="image/png" />
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>اپتیک مارت</title>
 		<script id="clients-addresses" type="application/json">
 			{
-				"user": "http://127.0.0.1:10002"
+				"user": "http://127.0.0.1:10002",
+				"frame": "http://127.0.0.1:10003"
 			}
 		</script>
-		<script src="elements/shell-main.js" async></script>
-		<script
+		<script src="/elements/shell-main.js" async></script>
+		<!-- <script
 			src="https://unpkg.com/boxicons@latest/dist/boxicons.js"
 			async
-		></script>
+		></script> -->
 		<style>
 			html {
 				--first-color: #222831;
@@ -33,24 +34,24 @@
 
 			@font-face {
 				font-family: vazir;
-				src: url(assets/Vazir-Light.woff2);
+				src: url(/assets/Vazir-Light.woff2);
 				font-weight: 100 500;
 			}
 
 			@font-face {
 				font-family: vazir;
-				src: url(assets/Vazir-Medium.woff2);
+				src: url(/assets/Vazir-Medium.woff2);
 				font-weight: normal;
 			}
 
 			@font-face {
 				font-family: vazir;
-				src: url(assets/Vazir-Bold.woff2);
+				src: url(/assets/Vazir-Bold.woff2);
 				font-weight: bold;
 			}
 		</style>
 	</head>
-	<body>
+	<body dir="rtl">
 		<shell-main></shell-main>
 	</body>
 </html>

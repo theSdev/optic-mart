@@ -5,6 +5,7 @@ import serve from "rollup-plugin-serve";
 import { terser } from "rollup-plugin-terser";
 import typescript from "rollup-plugin-typescript2";
 
+const production = !process.env.ROLLUP_WATCH;
 const plugins = [
 	copy({
 		targets: [
@@ -27,7 +28,7 @@ const plugins = [
 			"Access-Control-Allow-Origin": "*",
 		},
 	}),
-	// terser(),
+	production && terser(),
 	typescript({
 		objectHashIgnoreUnknownHack: true,
 	}),

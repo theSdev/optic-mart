@@ -10,10 +10,28 @@ export default css`
 		font-family: inherit;
 	}
 
+	.break-line {
+		grid-column-start: 1;
+	}
+
+	.checkbox-wrapper {
+		display: flex;
+	}
+
+	.checkbox-wrapper label {
+		align-self: center;
+		display: flex;
+		align-items: center;
+	}
+
 	.primary,
 	[type="submit"] {
 		background-color: var(--first-color);
 		color: var(--fourth-color);
+	}
+
+	.whole-row {
+		grid-column: 1 / -1;
 	}
 
 	a:link,
@@ -71,22 +89,39 @@ export default css`
 	fieldset > div {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		grid-gap: 1em;
+		grid-gap: 20px;
+	}
+
+	fieldset > div > label {
+		display: grid;
+		grid-gap: 0.5em;
 	}
 
 	h1 {
 		margin: 0;
 	}
 
-	input {
-		border: 1px currentColor solid;
-		height: 2.5ex;
-
-		padding: 1ex;
+	input[type="file"],
+	input[type="number"],
+	input[type="text"],
+	select {
+		height: 5ex;
 	}
 
-	label {
-		display: grid;
-		grid-gap: 0.5em;
+	input[type="file"],
+	input[type="number"],
+	input[type="text"],
+	select,
+	textarea {
+		border: 1px currentColor solid;
+		box-sizing: border-box;
+		height: 5ex;
+		padding: 1ex;
+		width: 100%;
+	}
+
+	textarea {
+		resize: block;
+		min-height: 8ex;
 	}
 `;

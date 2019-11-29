@@ -1,4 +1,5 @@
 import copy from "rollup-plugin-copy";
+import json from "rollup-plugin-json";
 import resolve from "rollup-plugin-node-resolve";
 import serve from "rollup-plugin-serve";
 import { terser } from "rollup-plugin-terser";
@@ -15,12 +16,17 @@ const plugins = [
 			},
 		],
 	}),
+	json({
+		preferConst: true,
+	}),
 	resolve(),
 	serve({
 		contentBase: "dist",
-		historyApiFallback: "/index.html",
 		host: "127.0.0.1",
-		port: 10001,
+		port: 10003,
+		headers: {
+			"Access-Control-Allow-Origin": "*",
+		},
 	}),
 	production && terser(),
 	typescript({
@@ -30,11 +36,20 @@ const plugins = [
 
 export default [
 	{
-		input: "src/elements/shell-main.ts",
+		input: "src/elements/frame-create.ts",
 		output: {
-			file: "dist/elements/shell-main.js",
+			file: "dist/elements/frame-create.js",
 			format: "iife",
-			name: "ShellModule",
+			name: "FrameCreate",
+		},
+		plugins,
+	},
+	{
+		input: "src/elements/frame-index.ts",
+		output: {
+			file: "dist/elements/frame-index.js",
+			format: "iife",
+			name: "FrameIndex",
 		},
 		plugins,
 	},
