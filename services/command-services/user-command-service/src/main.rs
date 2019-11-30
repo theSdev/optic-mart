@@ -1,12 +1,13 @@
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use config::Config;
-mod event;
+use lazy_static;
 use std::collections::HashMap;
+
 mod user;
 mod utils;
 
-pub const ADDR: &str = "0.0.0.0:8080";
+pub const ADDR: &str = "0.0.0.0:8002";
 lazy_static::lazy_static! {
 	static ref SECRETS: HashMap<String, String> = {
 		let mut config = Config::default();

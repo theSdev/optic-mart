@@ -1,13 +1,12 @@
 use super::User;
-use crate::event::{Event, ExpectedVersion};
 use crate::utils;
-use actix_web::{error, web, HttpRequest, HttpResponse};
+use crate::utils::generate_uuid;
+use actix_web::{error, web, HttpResponse};
 use bcrypt::{hash, DEFAULT_COST};
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 use std::convert::TryFrom;
-use surf;
 
 //#region Event
 
@@ -72,27 +71,29 @@ pub struct WebModel {
 }
 
 pub async fn register_async(
-	req: HttpRequest,
 	user_model: web::Json<WebModel>,
 ) -> Result<HttpResponse, actix_web::Error> {
 	// Validate and convert user_model to UserRegisteredData.
 	let user = UserRegisteredData::try_from(user_model.into_inner())
 		.map_err(|e| error::ErrorBadRequest(e))?;
 
-	let conn = utils::get_postgres_connection().map_err(|e| error::ErrorInternalServerError(e))?;
+	let user_command_conn =
+		utils::get_user_command_db_connection().map_err(|e| error::ErrorInternalServerError(e))?;
 
-	conn.execute(
-		r#"CREATE TABLE IF NOT EXISTS "user" (
-			    username        VARCHAR PRIMARY KEY,
-			    password        VARCHAR NOT NULL,
-			    email           VARCHAR NOT NULL UNIQUE
+	user_command_conn
+		.execute(
+			r#"CREATE TABLE IF NOT EXISTS "user" (
+			    id              UUID NOT NULL,
+			    username        TEXT NOT NULL UNIQUE,
+			    password        TEXT NOT NULL,
+			    email           TEXT NOT NULL UNIQUE
 			  )"#,
-		&[],
-	)
-	.map_err(|e| error::ErrorInternalServerError(e))?;
+			&[],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
 
 	// Check for username and email uniqueness.
-	for row in &conn
+	for row in &user_command_conn
 		.query(r#"SELECT username, email FROM "user""#, &[])
 		.map_err(|e| error::ErrorInternalServerError(e))?
 	{
@@ -106,50 +107,57 @@ pub async fn register_async(
 		}
 	}
 
-	// Save user in postgres
-	conn.execute(
-		r#"INSERT INTO "user" (username, password, email) VALUES ($1, $2, $3)"#,
-		&[&user.username, &user.password, &user.email],
-	)
-	.map_err(|e| error::ErrorInternalServerError(e))?;
-
+	let user_id = generate_uuid();
 	let username = user.username.clone();
 
-	// Construct event
-	let event_data = &UserRegisteredData::from(user);
-	let event = Event::UserRegistered(event_data.clone());
-	let event_id = utils::get_correlation_id(req.headers().get("X-Correlation-ID"));
+	// Save user in Postgres
+	user_command_conn
+		.execute(
+			r#"INSERT INTO "user" (id, username, password, email) VALUES ($1, $2, $3, $4)"#,
+			&[&user_id, &user.username, &user.password, &user.email],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
 
 	// Persist to Event Store.
-	let es_res = surf::post(format!("http://localhost:2113/streams/user-{}", username).as_str())
-		.set_header("Content-Type", "application/json")
-		.set_header(
-			"ES-ExpectedVersion",
-			(ExpectedVersion::StreamShouldNotExist as i8).to_string(),
-		)
-		.set_header("ES-EventId", event_id)
-		.set_header("ES-EventType", event.to_string())
-		.body_json(event_data)
-		.map_err(|e| error::ErrorInternalServerError(e))?
-		.await;
+	let event_data = &UserRegisteredData::from(user);
 
-	// Remove user from postgres if event registration is not successful and return error.
-	if es_res.is_err() {
-		let _delete_res = conn.execute(r#"DELETE FROM "user" where username = $1"#, &[&username]);
-		es_res.map_err(|e| error::ErrorInternalServerError(e))?;
-	}
+	let event_store_conn =
+		utils::get_event_store_db_connection().map_err(|e| error::ErrorInternalServerError(e))?;
+
+	event_store_conn
+		.execute(
+			r#"CREATE TABLE IF NOT EXISTS "user" (
+				id              SERIAL PRIMARY KEY,
+				entity_id       UUID NOT NULL,
+				type            TEXT NOT NULL,
+				body            JSON NOT NULL,
+				inserted_at     TIMESTAMP(6) NOT NULL DEFAULT (statement_timestamp() at time zone 'utc')
+			  )"#,
+			&[],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
+
+	// Store event.
+	event_store_conn
+		.execute(
+			r#"INSERT INTO "user" (entity_id, type, body) VALUES ($1, $2, $3)"#,
+			&[
+				&user_id,
+				&"UserRegistered",
+				&serde_json::to_string(event_data)
+					.map_err(|e| error::ErrorInternalServerError(e))?,
+			],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
 
 	// Return successfully.
 	Ok(HttpResponse::Created()
-		.header("Location", format!("{}/users/{}", crate::ADDR, username))
+		.header("Location", format!("{}/users/{}", crate::ADDR, &username))
 		.body("user registered successfully"))
 }
 
-pub fn register(
-	req: HttpRequest,
-	user_model: web::Json<WebModel>,
-) -> Result<HttpResponse, actix_web::Error> {
-	async_std::task::block_on(register_async(req, user_model))
+pub fn register(user_model: web::Json<WebModel>) -> Result<HttpResponse, actix_web::Error> {
+	async_std::task::block_on(register_async(user_model))
 }
 
 //#endregion

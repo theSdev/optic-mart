@@ -6,7 +6,7 @@ use std::collections::HashMap;
 mod frame;
 mod utils;
 
-pub const ADDR: &str = "0.0.0.0:8083";
+pub const ADDR: &str = "0.0.0.0:8003";
 lazy_static::lazy_static! {
 	static ref SECRETS: HashMap<String, String> = {
 		let mut config = Config::default();
