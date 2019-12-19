@@ -1,11 +1,10 @@
 use super::Frame;
-use crate::event::{Event, ExpectedVersion};
 use crate::utils;
+use crate::utils::{generate_uuid, Claims};
 use actix_web::{error, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 use std::convert::TryFrom;
-use surf;
 
 //#region Event
 
@@ -56,7 +55,7 @@ impl TryFrom<WebModel> for FrameCreatedData {
 			materials: frame_model.materials,
 			model_name: frame_model.model_name,
 			other_images: frame_model.other_images,
-			owner_id: "".to_string(),
+			owner_id: frame_model.owner_id.ok_or("Missing owner_id")?,
 			price: frame_model.price,
 			privacy_mode: frame_model.privacy_mode,
 		})
@@ -78,46 +77,72 @@ pub struct WebModel {
 	materials: Vec<String>,
 	model_name: String,
 	other_images: Vec<String>,
+	owner_id: Option<String>,
 	price: f32,
 	privacy_mode: u8,
 }
 
 pub async fn create_async(
 	req: HttpRequest,
-	user_model: web::Json<WebModel>,
+	mut frame_model: web::Json<WebModel>,
 ) -> Result<HttpResponse, actix_web::Error> {
-	// Validate and convert user_model to UserRegisteredData.
-	let frame = FrameCreatedData::try_from(user_model.into_inner())
+	let auth_header = req
+		.headers()
+		.get("Authorization")
+		.ok_or(error::ErrorUnauthorized("Auth required."))?
+		.to_str()
 		.map_err(|e| error::ErrorBadRequest(e))?;
 
-	// Construct event
-	let owner_username = "".to_owned();
+	let token = auth_header.replace(&"Bearer", &"");
+	let token = token.as_str().trim();
+
+	let jwt_key = crate::SECRETS
+		.get("jwt_key")
+		.ok_or(error::ErrorInternalServerError("Failed to get jwt_key"))?;
+
+	let token = jwt::decode::<Claims>(token, jwt_key.as_ref(), &jwt::Validation::default())
+		.map_err(|e| error::ErrorBadRequest(e))?;
+	frame_model.owner_id = Some(token.claims.id);
+
+	// Validate and convert frame_model to UserRegisteredData.
+	let frame = FrameCreatedData::try_from(frame_model.into_inner())
+		.map_err(|e| error::ErrorBadRequest(e))?;
+
+	let frame_id = generate_uuid();
+	let owner_username = token.claims.sub.to_owned();
 	let brand_name = frame.brand_name.clone();
 	let model_name = frame.model_name.clone();
-	let event_data = &FrameCreatedData::from(frame);
-	let event = Event::FrameCreated(event_data.clone());
-	let event_id = utils::get_correlation_id(req.headers().get("X-Correlation-ID"));
 
 	// Persist to Event Store.
-	let es_res = surf::post(
-		format!(
-			"http://localhost:2113/streams/frame-{}-{}-{}",
-			owner_username, brand_name, model_name
-		)
-		.as_str(),
-	)
-	.set_header("Content-Type", "application/json")
-	.set_header(
-		"ES-ExpectedVersion",
-		(ExpectedVersion::StreamShouldNotExist as i8).to_string(),
-	)
-	.set_header("ES-EventId", event_id)
-	.set_header("ES-EventType", event.to_string())
-	.body_json(event_data)
-	.map_err(|e| error::ErrorInternalServerError(e))?
-	.await;
+	let event_data = &FrameCreatedData::from(frame);
 
-	es_res.map_err(|e| error::ErrorInternalServerError(e))?;
+	let event_store_conn =
+		utils::get_event_store_db_connection().map_err(|e| error::ErrorInternalServerError(e))?;
+
+	event_store_conn
+		.execute(
+			r#"CREATE TABLE IF NOT EXISTS "frame" (
+				id              SERIAL PRIMARY KEY,
+				entity_id       TEXT NOT NULL,
+				type            TEXT NOT NULL,
+				body            TEXT NOT NULL,
+				inserted_at     TIMESTAMP(6) NOT NULL DEFAULT (statement_timestamp() at time zone 'utc')
+			  )"#,
+			&[],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
+
+	event_store_conn
+		.execute(
+			r#"INSERT INTO "frame" (entity_id, type, body) VALUES ($1, $2, $3)"#,
+			&[
+				&frame_id,
+				&"FrameCreated",
+				&serde_json::to_string(event_data)
+					.map_err(|e| error::ErrorInternalServerError(e))?,
+			],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
 
 	// Return successfully.
 	Ok(HttpResponse::Created()
@@ -136,9 +161,9 @@ pub async fn create_async(
 
 pub fn create(
 	req: HttpRequest,
-	user_model: web::Json<WebModel>,
+	frame_model: web::Json<WebModel>,
 ) -> Result<HttpResponse, actix_web::Error> {
-	async_std::task::block_on(create_async(req, user_model))
+	async_std::task::block_on(create_async(req, frame_model))
 }
 
 //#endregion

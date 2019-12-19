@@ -1,5 +1,5 @@
 [package]
-name = "user-query-service"
+name = "frame-query-service"
 version = "0.1.0"
 authors = ["thesdev <thesdev@outlook.com>"]
 edition = "2018"
@@ -15,6 +15,7 @@ config = "0.9"
 jwt = { package = "jsonwebtoken", version = "6" }
 lazy_static = "1.4"
 postgres = { version = "0.16.0-rc.2", features = ["with-chrono-0_4"] }
+regex = "1"
 serde = "1"
 serde_json = "1"
 surf = "1"

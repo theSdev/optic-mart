@@ -11,15 +11,20 @@ export class UserLogin extends LitElement {
 
 	static styles = [commonStyles, css``];
 
-	login(e: Event) {
+	async login(e: Event) {
 		e.preventDefault();
-		fetch(`${config.serviceAddress}/users/${this.model.username}/tokens`, {
-			body: this.model.password,
-			headers: {
-				"Content-Type": "text/plain",
-			},
-			method: "POST",
-		});
+		const response = await fetch(
+			`${config.serviceAddress}/users/${this.model.username}/tokens`,
+			{
+				body: this.model.password,
+				headers: {
+					"Content-Type": "text/plain",
+				},
+				method: "POST",
+			}
+		);
+		const token = await response.text();
+		sessionStorage.setItem("bearer", token);
 	}
 
 	render() {

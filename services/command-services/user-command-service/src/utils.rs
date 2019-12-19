@@ -4,8 +4,9 @@ use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-	pub sub: String,
+	pub id: String,
 	pub exp: usize,
+	pub sub: String,
 }
 
 pub fn generate_uuid() -> String {

@@ -83,7 +83,7 @@ pub async fn register_async(
 	user_command_conn
 		.execute(
 			r#"CREATE TABLE IF NOT EXISTS "user" (
-			    id              UUID NOT NULL,
+			    id              TEXT NOT NULL PRIMARY KEY,
 			    username        TEXT NOT NULL UNIQUE,
 			    password        TEXT NOT NULL,
 			    email           TEXT NOT NULL UNIQUE
@@ -128,16 +128,15 @@ pub async fn register_async(
 		.execute(
 			r#"CREATE TABLE IF NOT EXISTS "user" (
 				id              SERIAL PRIMARY KEY,
-				entity_id       UUID NOT NULL,
+				entity_id       TEXT NOT NULL,
 				type            TEXT NOT NULL,
-				body            JSON NOT NULL,
+				body            TEXT NOT NULL,
 				inserted_at     TIMESTAMP(6) NOT NULL DEFAULT (statement_timestamp() at time zone 'utc')
 			  )"#,
 			&[],
 		)
 		.map_err(|e| error::ErrorInternalServerError(e))?;
 
-	// Store event.
 	event_store_conn
 		.execute(
 			r#"INSERT INTO "user" (entity_id, type, body) VALUES ($1, $2, $3)"#,

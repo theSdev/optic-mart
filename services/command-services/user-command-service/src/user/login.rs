@@ -45,8 +45,9 @@ pub async fn login_async(
 
 	// Generate token.
 	let claims = Claims {
-		sub: username.clone(),
+		id: stored_id.clone(),
 		exp: (Utc::now().timestamp() + (2 * 60 * 60)) as usize,
+		sub: username.clone(),
 	};
 	let jwt_key = crate::SECRETS
 		.get("jwt_key")
@@ -65,7 +66,7 @@ pub async fn login_async(
 	// Store event.
 	event_store_conn
 		.execute(
-			r#"INSERT INTO "user" (uuid, type, body) VALUES ($1, $2, $3)"#,
+			r#"INSERT INTO "user" (entity_id, type, body) VALUES ($1, $2, $3)"#,
 			&[
 				&stored_id,
 				&"UserLoggedIn",

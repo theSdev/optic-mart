@@ -1,7 +1,6 @@
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use config::Config;
-mod event;
 use std::collections::HashMap;
 mod frame;
 mod utils;

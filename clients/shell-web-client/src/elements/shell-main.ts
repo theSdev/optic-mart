@@ -31,9 +31,10 @@ export class ShellMain extends LitElement {
 				align-items: center;
 				padding: 1em;
 				position: fixed;
-				width: 100%;
-				height: 80px;
+				width: calc(100% - 2px);
+				height: calc(80px - 2px);
 				box-sizing: border-box;
+				margin: 1px;
 			}
 
 			header {

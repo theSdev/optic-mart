@@ -25,6 +25,7 @@ export class FrameCreate extends LitElement {
 		fetch(`${config.serviceAddress}/frames`, {
 			body: JSON.stringify(this.model),
 			headers: {
+				Authorization: `Bearer ${sessionStorage.getItem("bearer")}`,
 				"Content-Type": "application/json",
 			},
 			method: "POST",
