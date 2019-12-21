@@ -53,4 +53,22 @@ export default [
 		},
 		plugins,
 	},
+	{
+		input: "src/elements/frame-list.ts",
+		output: {
+			file: "dist/elements/frame-list.js",
+			format: "iife",
+			name: "FrameList",
+		},
+		plugins,
+	},
+	{
+		input: "src/elements/frame-view.ts",
+		output: {
+			file: "dist/elements/frame-view.js",
+			format: "iife",
+			name: "FrameView",
+		},
+		plugins,
+	},
 ];

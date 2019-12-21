@@ -4,23 +4,7 @@ import { config } from "../../package.json";
 
 @customElement("frame-index")
 export class FrameIndex extends LitElement {
-	@property({ type: Object }) model = {
-		username: "",
-		password: "",
-	};
-
 	static styles = [commonStyles, css``];
-
-	login(e: Event) {
-		e.preventDefault();
-		fetch(`${config.serviceAddress}/users/${this.model.username}/tokens`, {
-			body: this.model.password,
-			headers: {
-				"Content-Type": "text/plain",
-			},
-			method: "POST",
-		});
-	}
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -53,7 +37,7 @@ export class FrameIndex extends LitElement {
 
 				<section>
 					<a href="/frame/create" data-element-name="frame-create">
-						<box-icon color="currentColor" name="user-plus"></box-icon>
+						<box-icon color="currentColor" name="plus-circle"></box-icon>
 						<span>افزودن</span>
 					</a>
 				</section>

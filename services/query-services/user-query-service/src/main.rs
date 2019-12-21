@@ -25,19 +25,18 @@ lazy_static::lazy_static! {
 async fn main() {
 	println!("Listening on {}", ADDR);
 	async_std::task::spawn(update_users());
-	dbg!();
 
-	thread::spawn(|| {
-		HttpServer::new(|| {
-			App::new()
-				.wrap(Cors::new())
-				.service(web::scope("/users").route("", web::get().to(user::get_all::get_all)))
-		})
-		.bind(ADDR)
-		.unwrap()
-		.run()
-		.unwrap();
-	});
+	HttpServer::new(|| {
+		App::new().wrap(Cors::new()).service(
+			web::scope("/users")
+				.route("", web::get().to(user::get::get_all))
+				.route("/{id}", web::get().to(user::get::get)),
+		)
+	})
+	.bind(ADDR)
+	.unwrap()
+	.run()
+	.unwrap();
 }
 
 async fn update_users() {

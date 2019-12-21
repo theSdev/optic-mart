@@ -4,7 +4,8 @@
 	"description": "Optic Mart's User Web Client",
 	"main": "index.js",
 	"config": {
-		"serviceAddress": "//127.0.0.1:8003"
+		"serviceAddress": "//127.0.0.1:8003",
+		"queryAddress": "//127.0.0.1:9003"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"

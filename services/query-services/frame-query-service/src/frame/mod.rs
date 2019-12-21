@@ -6,23 +6,24 @@ pub mod get;
 
 //#region Frame
 
-#[derive(Debug, Serialize)]
-pub struct Frame<'a> {
+#[derive(Debug, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Frame {
 	brand_name: String,
-	colors: Vec<&'a str>,
+	colors: Vec<String>,
 	cover_image: Option<String>,
 	description: Option<String>,
 	id: String,
 	has_case: bool,
-	materials: Vec<&'a str>,
+	materials: Vec<String>,
 	model_name: String,
-	other_images: Vec<&'a str>,
+	other_images: Vec<String>,
 	owner_id: String,
 	price: f32,
 	privacy_mode: i16,
 }
 
-impl Frame<'_> {
+impl Frame {
 	fn get_field_regex_pattern(field_name: &str) -> Option<&'static str> {
 		match field_name {
 			"brand_name" => Some(r"^.{2,50}$"),

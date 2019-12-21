@@ -24,7 +24,7 @@ export class UserLogin extends LitElement {
 			}
 		);
 		const token = await response.text();
-		sessionStorage.setItem("bearer", token);
+		localStorage.setItem("bearer", token);
 	}
 
 	render() {

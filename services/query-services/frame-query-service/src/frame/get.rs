@@ -41,13 +41,13 @@ pub fn get(path: web::Path<(String,)>) -> Result<HttpResponse, actix_web::Error>
 	let frame = Frame {
 		id: stored_frame.get(0),
 		brand_name: stored_frame.get(1),
-		colors: colors.split(",").collect::<Vec<&str>>(),
+		colors: colors.split(",").map(|s| s.to_string()).collect(),
 		cover_image: stored_frame.get(3),
 		description: stored_frame.get(4),
 		has_case: stored_frame.get(5),
-		materials: materials.split(",").collect::<Vec<&str>>(),
+		materials: materials.split(",").map(|s| s.to_string()).collect(),
 		model_name: stored_frame.get(7),
-		other_images: other_images.split(",").collect::<Vec<&str>>(),
+		other_images: other_images.split(",").map(|s| s.to_string()).collect(),
 		owner_id: stored_frame.get(9),
 		price: stored_frame.get(10),
 		privacy_mode: stored_frame.get(11),
@@ -56,6 +56,63 @@ pub fn get(path: web::Path<(String,)>) -> Result<HttpResponse, actix_web::Error>
 	Ok(HttpResponse::Ok()
 		.content_type("application/json")
 		.body(serde_json::to_string(&frame).unwrap()))
+}
+
+pub fn get_list_by_owner_id(path: web::Path<(String,)>) -> Result<HttpResponse, actix_web::Error> {
+	let owner_id = &path.0;
+	dbg!(&owner_id);
+
+	let mut frame_query_conn = utils::get_frame_query_db_connection().unwrap();
+	let frame_rows = frame_query_conn
+		.query(
+			r#"SELECT
+				entity_id,
+				brand_name,
+				colors,
+			    	cover_image,
+			    	description,
+			    	has_case,
+			    	materials,
+			    	model_name,
+			    	other_images,
+			    	owner_id,
+			    	price,
+			    	privacy_mode,
+				updated_at
+				FROM "frame"
+				WHERE owner_id = $1"#,
+			&[&owner_id],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
+
+	let mut frames: Vec<Frame> = vec![];
+
+	for stored_frame in frame_rows {
+		let colors = stored_frame.get::<usize, String>(2);
+		let materials = stored_frame.get::<usize, String>(6);
+		let other_images = stored_frame.get::<usize, String>(8);
+
+		let frame = Frame {
+			id: stored_frame.get(0),
+			brand_name: stored_frame.get(1),
+			colors: colors.split(",").map(|s| s.to_string()).collect(),
+			cover_image: stored_frame.get(3),
+			description: stored_frame.get(4),
+			has_case: stored_frame.get(5),
+			materials: materials.split(",").map(|s| s.to_string()).collect(),
+			model_name: stored_frame.get(7),
+			other_images: other_images.split(",").map(|s| s.to_string()).collect(),
+			owner_id: stored_frame.get(9),
+			price: stored_frame.get(10),
+			privacy_mode: stored_frame.get(11),
+		};
+
+		frames.push(frame);
+	}
+
+	Ok(HttpResponse::Ok()
+		.content_type("application/json")
+		.body(serde_json::to_string(&frames).unwrap()))
 }
 
 pub fn get_all() -> impl Responder {

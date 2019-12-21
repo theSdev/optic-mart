@@ -8,7 +8,7 @@ export class FrameCreate extends LitElement {
 	@property({ type: Object }) model = {
 		brandName: "",
 		colors: new Array<string>(),
-		coverImage: null,
+		coverImage: "",
 		description: "",
 		hasCase: false,
 		materials: new Array<string>(),
@@ -25,22 +25,25 @@ export class FrameCreate extends LitElement {
 		fetch(`${config.serviceAddress}/frames`, {
 			body: JSON.stringify(this.model),
 			headers: {
-				Authorization: `Bearer ${sessionStorage.getItem("bearer")}`,
+				Authorization: `Bearer ${localStorage.getItem("bearer")}`,
 				"Content-Type": "application/json",
 			},
 			method: "POST",
 		});
 	}
 
-	tryReadFile(e: Event) {
+	async tryReadFile(e: Event) {
 		if (!(e.target instanceof HTMLInputElement)) return;
 
 		if (!e.target.files || !e.target.files.length) {
-			this.model.coverImage = null;
+			this.model.coverImage = "";
 			return;
 		}
 
-		resizeImage({ maxSize: 720, file: e.target.files[0] });
+		this.model.coverImage = await resizeImage({
+			maxSize: 240,
+			file: e.target.files[0],
+		});
 	}
 
 	render() {
@@ -157,7 +160,7 @@ export class FrameCreate extends LitElement {
 					</fieldset>
 
 					<button type="submit">
-						<box-icon color="currentColor" name="user-plus"></box-icon>
+						<box-icon color="currentColor" name="plus-circle"></box-icon>
 						افزودن
 					</button>
 				</form>

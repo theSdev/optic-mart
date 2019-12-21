@@ -1,23 +1,19 @@
 import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
 import { config } from "../../package.json";
+import { initElementIfUninit, parseJwt } from "../utils/helpers";
 
-@customElement("frame-view")
-export class FrameView extends LitElement {
+@customElement("user-view")
+export class UserView extends LitElement {
 	@property({ type: Object }) model = {
-		brandName: "",
-		colors: new Array<string>(),
-		coverImage: null,
-		description: "",
-		hasCase: false,
-		materials: new Array<string>(),
-		modelName: "",
-		otherImages: new Array<string>(),
-		price: 0,
-		privacyMode: 1,
+		name: "",
+		username: "",
+		email: "",
 	};
 
 	entityId: string | null = null;
+
+	loggedInUserId: string | null = null;
 
 	static styles = [
 		commonStyles,
@@ -42,9 +38,9 @@ export class FrameView extends LitElement {
 		`,
 	];
 
-	async getFrame() {
+	async getUser() {
 		const response = await fetch(
-			`${config.queryAddress}/frames/${this.entityId}`,
+			`${config.queryAddress}/users/${this.entityId}`,
 			{
 				method: "GET",
 			}
@@ -74,45 +70,54 @@ export class FrameView extends LitElement {
 				})
 			);
 		});
-		setTimeout(() => {
-			this.entityId = new URL(window.location.href).searchParams.get("id");
 
-			this.getFrame();
-		});
+		this.shadowRoot!.addEventListener("navigate", e =>
+			this.shadowRoot!.dispatchEvent(e)
+		);
+
+		this.entityId = new URL(window.location.href).searchParams.get("id");
+
+		const token = localStorage.getItem("bearer");
+		if (token) {
+			try {
+				this.loggedInUserId = parseJwt(token).id;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
+		initElementIfUninit("frame-list");
+
+		this.getUser();
 	}
 
 	render() {
 		return html`
 			<article>
 				<h1>
-					عینک
-					<button class="secondary">
-						<box-icon color="currentColor" name="cart"></box-icon>
-						سفارش
-					</button>
+					کاربر
+					${this.loggedInUserId && this.loggedInUserId != this.entityId && false
+						? html`
+								<button class="secondary">
+									<box-icon color="currentColor" name="user-plus"></box-icon>
+									دنبال کردن
+								</button>
+						  `
+						: null}
 				</h1>
 
 				<section>
-					${this.model.coverImage
-						? html`
-								<img src="${this.model.coverImage}" />
-						  `
-						: null}
 					<dl>
-						<dt>برند</dt>
-						<dd>${this.model.brandName}</dd>
-						<dt>مدل</dt>
-						<dd>${this.model.modelName}</dd>
-						<dt>رنگ ها</dt>
-						<dd>${this.model.colors.join(" - ") || "-"}</dd>
-						<dt>توضیحات</dt>
-						<dd>${this.model.description || "-"}</dd>
-						<dt>متریال ها</dt>
-						<dd>${this.model.materials.join(" - ") || "-"}</dd>
-						<dt>قیمت</dt>
-						<dd>${this.model.price}</dd>
+						<dt>نام</dt>
+						<dd>${this.model.name}</dd>
+						<dt>نام کاربری</dt>
+						<dd>${this.model.username}</dd>
+						<dt>ایمیل</dt>
+						<dd>${this.model.email}</dd>
 					</dl>
 				</section>
+
+				<frame-list userid="${this.entityId}"></frame-list>
 			</article>
 		`;
 	}

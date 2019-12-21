@@ -53,4 +53,13 @@ export default [
 		},
 		plugins,
 	},
+	{
+		input: "src/elements/user-view.ts",
+		output: {
+			file: "dist/elements/user-view.js",
+			format: "iife",
+			name: "UserView",
+		},
+		plugins,
+	},
 ];

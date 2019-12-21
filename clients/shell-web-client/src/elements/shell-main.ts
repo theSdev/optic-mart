@@ -12,6 +12,10 @@ export class ShellMain extends LitElement {
 				height: 100%;
 			}
 
+			box-icon[name="list-ul"] {
+				transform: rotateY(0.5turn);
+			}
+
 			footer {
 				border-bottom-left-radius: 0;
 				border-bottom-right-radius: 0;
@@ -75,7 +79,7 @@ export class ShellMain extends LitElement {
 		ShellMain.navigate(e.detail.elementName, e.detail.href);
 	}
 
-	static navigate(elementName: string, href: string) {
+	static navigate(elementName: string, href: string, pushState = true) {
 		if (!customElements.get(elementName)) {
 			const clientName = elementName.split("-")[0];
 			const clientAddress = getClientAddress(clientName);
@@ -90,7 +94,7 @@ export class ShellMain extends LitElement {
 			.shadowRoot!.querySelector(
 				"main"
 			)!.innerHTML = `<${elementName}></${elementName}>`;
-		window.history.pushState(null, elementName, href);
+		pushState && window.history.pushState(null, elementName, href);
 
 		function getClientAddress(clientName: string) {
 			const clientsAddresses = JSON.parse(
@@ -108,12 +112,18 @@ export class ShellMain extends LitElement {
 	}
 
 	firstUpdated() {
+		this.currentUrlNavigate(null);
+		window.addEventListener("popstate", this.currentUrlNavigate);
+	}
+
+	currentUrlNavigate(e: Event | null) {
+		console.log(e);
 		const currentURL = new URL(window.location.href);
-		(this.shadowRoot!.querySelector(
-			`a[href='${
-				currentURL.pathname.length > 1 ? currentURL.pathname : "/frame/index"
-			}']`
-		)! as HTMLAnchorElement).click();
+		const elementName = currentURL.pathname
+			.split("/")
+			.splice(1, 2)
+			.join("-");
+		ShellMain.navigate(elementName, currentURL.href, false);
 	}
 
 	render() {
@@ -141,18 +151,18 @@ export class ShellMain extends LitElement {
 					<a href="/frame/index" data-element-name="frame-index">
 						<box-icon
 							color="currentColor"
-							name="user-plus"
+							name="glasses-alt"
 							title="عینک"
 						></box-icon>
-						<span>عینک</span>
+						<span>عینک ها</span>
 					</a>
-					<a href="/user/register" data-element-name="user-register">
+					<a href="/order/index" data-element-name="order-index">
 						<box-icon
 							color="currentColor"
-							name="user-plus"
-							title="پروفایل"
+							name="list-ul"
+							title="سفارش"
 						></box-icon>
-						<span>پروفایل</span>
+						<span>سفارشات</span>
 					</a>
 				</nav>
 			</footer>

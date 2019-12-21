@@ -16,6 +16,11 @@ export default css`
 		color: var(--fourth-color);
 	}
 
+	.secondary {
+		background-color: var(--second-color);
+		color: var(--fourth-color);
+	}
+
 	a:link,
 	a:visited {
 		color: currentColor;
