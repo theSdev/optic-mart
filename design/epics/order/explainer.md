@@ -1,0 +1,8 @@
+- Users can order frames available on the platform in quantity (./order.md).  
+- Users can view a list of their placed orders collectively (./vieworderscollectively.md).  
+- Users can view their placed orders individually (./viewordersindividuallly.md).  
+- Frame owners can view a list of their received orders collectively (./vieworderscollectively.md).  
+- Frame owners can view their received orders individually (./viewordersindividuallly.md).  
+- Users can cancel their placed orders one at a time if they are not processed (./cancelunprocessedorder.md).  
+- Frame owners can mark a received order as processed (./markreceivedorderasprocessed.md).  
+- Frame owners can reject a received order (./rejectreceivedorder.md).  

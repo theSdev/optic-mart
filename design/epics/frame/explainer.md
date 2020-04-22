@@ -1,0 +1,11 @@
+- Frames can be viewed collectively by the owner (./viewframescollectivelybytheowner.md).  
+- Frames can be viewed individually (./viewframesindividually.md).  
+- Frames can also be viewed by other user or non-users if the privacy criteria is met (./viewframecollectionbyothers.md).  
+- A frame can be marked as completely private or price private (./markframeasprivate.md).  
+- A distributary or visitior on behalf of them can create frames (./createframe.md).  
+- Users can search for frames on the platform (./searchforframe.md).  
+- If the viewer of a frame's page is its owner, then they can see admin controls on the page to modify or remove the frame (./viewadmincontrolsonaframespage.md).  
+- A frame owner can modify their frames one at a time (./modifyframe.md).  
+- A frame owner can delete their frames one at a time (./deleteframe.md).
+- A frame owner can delete their frames collectively (./deleteagroupofframes.md).  
+- A follower can get notifications whenever their followees create a new frame or modify one (./getnotificationforframeactivity.md).  
