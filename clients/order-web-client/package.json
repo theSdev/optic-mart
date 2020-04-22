@@ -1,14 +1,12 @@
 {
-	"name": "user-web-client",
+	"name": "order-web-client",
 	"version": "0.1.0",
-	"description": "Optic Mart's User Web Client",
+	"description": "Optic Mart's Order Web Client",
 	"main": "index.js",
 	"config": {
-		"clientsAddresses": {
-			"user": "//127.0.0.1:10002",
-			"frame": "//127.0.0.1:10003",
-			"order": "//127.0.0.1:10004"
-		}
+		"serviceAddress": "//127.0.0.1:8004",
+		"queryAddress": "//127.0.0.1:9004",
+		"frameQueryAddress": "//127.0.0.1:9003"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
@@ -29,6 +27,7 @@
 	"homepage": "https://github.com/theSdev/optic-mart#readme",
 	"devDependencies": {
 		"lit-element": "^2.2.1",
+		"rollup": "^1.26.2",
 		"rollup-plugin-copy": "^3.1.0",
 		"rollup-plugin-json": "^4.0.0",
 		"rollup-plugin-node-resolve": "^5.2.0",
@@ -40,8 +39,5 @@
 	"prettier": {
 		"useTabs": true,
 		"trailingComma": "es5"
-	},
-	"dependencies": {
-		"page": "^1.11.5"
 	}
 }

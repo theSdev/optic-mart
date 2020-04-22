@@ -84,7 +84,7 @@ export class FrameList extends LitElement {
 			);
 		});
 
-		this.getFrames();
+		setTimeout(this.getFrames, 500);
 	}
 
 	render() {

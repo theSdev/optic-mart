@@ -25,6 +25,7 @@ export class UserLogin extends LitElement {
 		);
 		const token = await response.text();
 		localStorage.setItem("bearer", token);
+		window.location.href = "/";
 	}
 
 	render() {

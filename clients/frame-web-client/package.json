@@ -1,7 +1,7 @@
 {
-	"name": "user-web-client",
+	"name": "frame-web-client",
 	"version": "0.1.0",
-	"description": "Optic Mart's User Web Client",
+	"description": "Optic Mart's Frame Web Client",
 	"main": "index.js",
 	"config": {
 		"serviceAddress": "//127.0.0.1:8003",

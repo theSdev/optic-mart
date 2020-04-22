@@ -1,5 +1,6 @@
 import commonStyles from "../utils/common-styles";
 import { css, customElement, html, LitElement } from "lit-element";
+import { parseJwt, initElementIfUninit } from "../utils/helpers";
 
 @customElement("shell-main")
 export class ShellMain extends LitElement {
@@ -62,6 +63,8 @@ export class ShellMain extends LitElement {
 		`,
 	];
 
+	loggedInUsername: string | null = null;
+
 	tryAnchorNavigate(e: Event) {
 		if (!(e.target instanceof HTMLAnchorElement)) return;
 
@@ -79,15 +82,14 @@ export class ShellMain extends LitElement {
 		ShellMain.navigate(e.detail.elementName, e.detail.href);
 	}
 
+	logout(e: Event) {
+		e.preventDefault();
+		localStorage.removeItem("bearer");
+		window.location.reload();
+	}
+
 	static navigate(elementName: string, href: string, pushState = true) {
-		if (!customElements.get(elementName)) {
-			const clientName = elementName.split("-")[0];
-			const clientAddress = getClientAddress(clientName);
-			const elementFileAddress = `${clientAddress}/elements/${elementName}.js`;
-			const loadElementScript = document.createElement("script");
-			loadElementScript.src = elementFileAddress;
-			document.head.appendChild(loadElementScript);
-		}
+		initElementIfUninit(elementName);
 
 		document
 			.querySelector("shell-main")!
@@ -95,13 +97,6 @@ export class ShellMain extends LitElement {
 				"main"
 			)!.innerHTML = `<${elementName}></${elementName}>`;
 		pushState && window.history.pushState(null, elementName, href);
-
-		function getClientAddress(clientName: string) {
-			const clientsAddresses = JSON.parse(
-				document.getElementById("clients-addresses")!.innerHTML
-			);
-			return clientsAddresses[clientName];
-		}
 	}
 
 	connectedCallback() {
@@ -109,16 +104,26 @@ export class ShellMain extends LitElement {
 
 		this.shadowRoot!.addEventListener("click", this.tryAnchorNavigate);
 		this.shadowRoot!.addEventListener("navigate", this.customElementNavigate);
+
+		const token = localStorage.getItem("bearer");
+		if (token) {
+			try {
+				this.loggedInUsername = parseJwt(token).sub;
+			} catch (e) {
+				console.error(e);
+			}
+		}
 	}
 
 	firstUpdated() {
-		this.currentUrlNavigate(null);
+		this.currentUrlNavigate();
 		window.addEventListener("popstate", this.currentUrlNavigate);
 	}
 
-	currentUrlNavigate(e: Event | null) {
-		console.log(e);
+	currentUrlNavigate() {
 		const currentURL = new URL(window.location.href);
+		if (currentURL.pathname.length <= 1) return;
+
 		const elementName = currentURL.pathname
 			.split("/")
 			.splice(1, 2)
@@ -131,41 +136,58 @@ export class ShellMain extends LitElement {
 			<header class="primary">
 				<h1>اپتیک مارت</h1>
 				<nav>
-					<a href="/user/login" data-element-name="user-login">
-						<box-icon
-							color="currentColor"
-							type="solid"
-							name="arrow-to-left"
-						></box-icon>
-						<span>ورود</span>
-					</a>
-					<a href="/user/register" data-element-name="user-register">
-						<box-icon color="currentColor" name="user-plus"></box-icon>
-						<span>ثبت نام</span>
-					</a>
+					${!this.loggedInUsername
+						? html`
+								<a href="/user/login" data-element-name="user-login">
+									<box-icon
+										color="currentColor"
+										type="solid"
+										name="arrow-to-left"
+									></box-icon>
+									<span>ورود</span>
+								</a>
+								<a href="/user/register" data-element-name="user-register">
+									<box-icon color="currentColor" name="user-plus"></box-icon>
+									<span>ثبت نام</span>
+								</a>
+						  `
+						: html`
+								<a href="/user/logout" @click=${this.logout}>
+									<box-icon
+										color="currentColor"
+										type="solid"
+										name="arrow-to-left"
+									></box-icon>
+									<span>خروج</span>
+								</a>
+						  `}
 				</nav>
 			</header>
 			<main></main>
-			<footer class="outline-primary">
-				<nav>
-					<a href="/frame/index" data-element-name="frame-index">
-						<box-icon
-							color="currentColor"
-							name="glasses-alt"
-							title="عینک"
-						></box-icon>
-						<span>عینک ها</span>
-					</a>
-					<a href="/order/index" data-element-name="order-index">
-						<box-icon
-							color="currentColor"
-							name="list-ul"
-							title="سفارش"
-						></box-icon>
-						<span>سفارشات</span>
-					</a>
-				</nav>
-			</footer>
+			${this.loggedInUsername
+				? html`
+						<footer class="outline-primary">
+							<nav>
+								<a href="/frame/index" data-element-name="frame-index">
+									<box-icon
+										color="currentColor"
+										name="glasses-alt"
+										title="عینک"
+									></box-icon>
+									<span>عینک ها</span>
+								</a>
+								<a href="/order/index" data-element-name="order-index">
+									<box-icon
+										color="currentColor"
+										name="list-ul"
+										title="سفارش"
+									></box-icon>
+									<span>سفارشات</span>
+								</a>
+							</nav>
+						</footer>
+				  `
+				: null}
 		`;
 	}
 }

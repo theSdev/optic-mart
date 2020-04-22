@@ -133,19 +133,19 @@ export class FrameCreate extends LitElement {
 								</label>
 							</div>
 
-							<label>
+							<!--<label>
 								نحوه نمایش
 								<select
 									@input="${(e: Event) =>
-										(this.model.privacyMode = parseInt(
-											(e.target as HTMLSelectElement).value
-										))}"
+								(this.model.privacyMode = parseInt(
+									(e.target as HTMLSelectElement).value
+								))}"
 								>
 									<option value="1" selected>نمایش برای همه</option>
 									<option value="2">نمایش فقط برای دنبال کنندگان</option>
 									<option value="3">نمایش قیمت فقط برای دنبال کنندگان</option>
 								</select>
-							</label>
+							</label>-->
 
 							<label class="whole-row">
 								توضیحات

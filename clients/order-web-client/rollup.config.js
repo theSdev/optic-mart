@@ -22,9 +22,11 @@ const plugins = [
 	resolve(),
 	serve({
 		contentBase: "dist",
-		historyApiFallback: "/index.html",
 		host: "127.0.0.1",
-		port: 10001,
+		port: 10004,
+		headers: {
+			"Access-Control-Allow-Origin": "*",
+		},
 	}),
 	production && terser(),
 	typescript({
@@ -34,11 +36,20 @@ const plugins = [
 
 export default [
 	{
-		input: "src/elements/shell-main.ts",
+		input: "src/elements/order-index.ts",
 		output: {
-			file: "dist/elements/shell-main.js",
+			file: "dist/elements/order-index.js",
 			format: "iife",
-			name: "ShellModule",
+			name: "OrderIndex",
+		},
+		plugins,
+	},
+	{
+		input: "src/elements/order-place.ts",
+		output: {
+			file: "dist/elements/order-place.js",
+			format: "iife",
+			name: "OrderPlace",
 		},
 		plugins,
 	},

@@ -75,8 +75,6 @@ export class UserView extends LitElement {
 			this.shadowRoot!.dispatchEvent(e)
 		);
 
-		this.entityId = new URL(window.location.href).searchParams.get("id");
-
 		const token = localStorage.getItem("bearer");
 		if (token) {
 			try {
@@ -88,7 +86,10 @@ export class UserView extends LitElement {
 
 		initElementIfUninit("frame-list");
 
-		this.getUser();
+		setTimeout(() => {
+			this.entityId = new URL(window.location.href).searchParams.get("id");
+			this.getUser();
+		});
 	}
 
 	render() {
@@ -117,7 +118,7 @@ export class UserView extends LitElement {
 					</dl>
 				</section>
 
-				<frame-list userid="${this.entityId}"></frame-list>
+				<frame-list .userid="${this.entityId}"></frame-list>
 			</article>
 		`;
 	}

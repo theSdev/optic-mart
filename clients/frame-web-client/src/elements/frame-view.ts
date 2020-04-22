@@ -26,8 +26,9 @@ export class FrameView extends LitElement {
 				display: flex;
 			}
 
-			h1 button {
+			h1 a {
 				margin-right: auto;
+				font-size: 1rem;
 			}
 
 			dl {
@@ -38,6 +39,12 @@ export class FrameView extends LitElement {
 
 			dt::after {
 				content: ":";
+			}
+
+			@media (min-width: 768px) {
+				img {
+					float: left;
+				}
 			}
 		`,
 	];
@@ -86,10 +93,13 @@ export class FrameView extends LitElement {
 			<article>
 				<h1>
 					عینک
-					<button class="secondary">
+					<a
+						href="/order/place?frameId=${this.entityId}"
+						data-element-name="order-place"
+					>
 						<box-icon color="currentColor" name="cart"></box-icon>
 						سفارش
-					</button>
+					</a>
 				</h1>
 
 				<section>
