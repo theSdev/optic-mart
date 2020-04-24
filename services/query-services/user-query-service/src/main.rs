@@ -1,0 +1,161 @@
+use actix_cors::Cors;
+use actix_web::{web, App, HttpServer};
+use chrono::prelude::*;
+use config::Config;
+use lazy_static;
+use serde_json;
+use std::collections::HashMap;
+use std::thread;
+use std::time::Duration;
+
+mod event;
+mod user;
+mod utils;
+
+pub const ADDR: &str = "0.0.0.0:9002";
+lazy_static::lazy_static! {
+	static ref SECRETS: HashMap<String, String> = {
+		let mut config = Config::default();
+		config.merge(config::File::with_name("secrets")).unwrap();
+		config.try_into::<HashMap<String, String>>().unwrap()
+	};
+}
+
+#[async_std::main]
+async fn main() {
+	println!("Listening on {}", ADDR);
+	async_std::task::spawn(update_users());
+
+	HttpServer::new(|| {
+		App::new().wrap(Cors::new()).service(
+			web::scope("/users")
+				.route("", web::get().to(user::get::get_all))
+				.route("/{id}", web::get().to(user::get::get)),
+		)
+	})
+	.bind(ADDR)
+	.unwrap()
+	.run()
+	.unwrap();
+}
+
+async fn update_users() {
+	use event::*;
+
+	let mut event_store_conn = utils::get_event_store_db_connection().unwrap();
+
+	let mut tracked_users = HashMap::<String, NaiveDateTime>::new();
+
+	let mut user_query_conn = utils::get_user_query_db_connection().unwrap();
+	user_query_conn
+		.execute(
+			r#"CREATE TABLE IF NOT EXISTS "user" (
+			    id              SERIAL PRIMARY KEY,
+			    entity_id       TEXT NOT NULL,
+			    name            TEXT NOT NULL,
+			    start_date      DATE,
+			    address         TEXT,
+			    phone_number    TEXT,
+			    username        TEXT NOT NULL UNIQUE,
+			    email           TEXT NOT NULL UNIQUE,
+			    photo           TEXT,
+			    updated_at      TIMESTAMP(6) NOT NULL
+			  )"#,
+			&[],
+		)
+		.unwrap();
+
+	let user_rows = &user_query_conn
+		.query(r#"SELECT entity_id, updated_at FROM "user""#, &[])
+		.unwrap();
+
+	for row in user_rows {
+		let user_id = row.get(0);
+		let updated_at: NaiveDateTime = row.get(1);
+		tracked_users.insert(user_id, updated_at);
+	}
+
+	loop {
+		let read_res = (|| {
+			let tracked_entity_ids = &tracked_users
+				.keys()
+				.into_iter()
+				.map(|s| s.clone())
+				.collect::<Vec<String>>();
+			dbg!(tracked_entity_ids);
+
+			let event_rows = &event_store_conn
+				.query(
+					r#"SELECT entity_id, body, inserted_at FROM "user"
+					WHERE type = $1"#,
+					&[&"UserRegistered"],
+				)
+				.map_err(|e| e.to_string())?;
+
+			for row in event_rows {
+				let persist_res = (|| {
+					let entity_id: String = row.get(0);
+					dbg!(&entity_id);
+
+					if !tracked_entity_ids.contains(&entity_id) {
+						let body: String = row.get(1);
+						dbg!(&body);
+						let body: UserRegisteredData =
+							serde_json::from_str(&body).map_err(|e| e.to_string())?;
+
+						let inserted_at: NaiveDateTime = row.get(2);
+
+						// Save user in Postgres
+						user_query_conn
+							.execute(
+								r#"INSERT INTO "user"
+								(entity_id,
+								name,
+								start_date,
+								address,
+								phone_number,
+								username,
+								email,
+								photo,
+								updated_at)
+								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"#,
+								&[
+									&entity_id,
+									&body.name,
+									&body.start_date,
+									&body.address,
+									&body.phone_number,
+									&body.username,
+									&body.email,
+									&body.photo,
+									&inserted_at,
+								],
+							)
+							.map_err(|e| e.to_string())?;
+
+						tracked_users.insert(entity_id, inserted_at);
+					}
+					Ok::<(), String>(())
+				})();
+
+				if persist_res.is_err() {
+					dbg!(persist_res.unwrap_err());
+				}
+			}
+
+			Ok::<(), String>(())
+		})();
+
+		if read_res.is_err() {
+			dbg!("{}", read_res.unwrap_err());
+		}
+
+		thread::sleep(Duration::from_secs(30));
+
+		/*
+			let t = &"2019-11-30 08:20:14.210265"[..19];
+			let a = Utc.datetime_from_str(t, "%Y-%m-%d %H:%M:%S");
+			println!("{:?}", a);
+		*/
+	}
+}
