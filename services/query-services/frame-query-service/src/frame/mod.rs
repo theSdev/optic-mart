@@ -3,6 +3,7 @@ use serde::Serialize;
 use std::any::Any;
 
 pub mod get;
+pub mod search;
 
 //#region Frame
 

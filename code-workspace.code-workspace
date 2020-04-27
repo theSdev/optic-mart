@@ -1,0 +1,17 @@
+{
+  "folders": [
+	{
+		"path": "clients/shell-web-client"
+	},
+	{
+		"path": "clients/user-web-client"
+	},
+	{
+		"path": "clients/frame-web-client"
+	},
+	{
+		"path": "clients/order-web-client"
+	}
+],
+  "settings": {}
+}

@@ -1,7 +1,7 @@
 import { css } from "lit-element";
 
 export default css`
-	:host {
+	:host:not([hidden]) {
 		display: block;
 	}
 
@@ -85,8 +85,8 @@ export default css`
 
 	input {
 		border: 1px currentColor solid;
+		box-sizing: content-box;
 		height: 2.5ex;
-
 		padding: 1ex;
 	}
 

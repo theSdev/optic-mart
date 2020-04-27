@@ -52,7 +52,7 @@ export class UserView extends LitElement {
 		super.connectedCallback();
 
 		//redispatch anchor click event as navigate event to pass shadow boundary;
-		this.shadowRoot!.addEventListener("click", e => {
+		this.shadowRoot!.addEventListener("click", (e) => {
 			if (!(e.target instanceof HTMLAnchorElement)) return;
 
 			const elementName = e.target.dataset.elementName;
@@ -71,7 +71,7 @@ export class UserView extends LitElement {
 			);
 		});
 
-		this.shadowRoot!.addEventListener("navigate", e =>
+		this.shadowRoot!.addEventListener("navigate", (e) =>
 			this.shadowRoot!.dispatchEvent(e)
 		);
 
@@ -118,7 +118,7 @@ export class UserView extends LitElement {
 					</dl>
 				</section>
 
-				<frame-list .userid="${this.entityId}"></frame-list>
+				<frame-list .userId="${this.entityId}"></frame-list>
 			</article>
 		`;
 	}

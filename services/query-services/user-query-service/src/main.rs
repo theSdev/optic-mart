@@ -27,11 +27,14 @@ async fn main() {
 	async_std::task::spawn(update_users());
 
 	HttpServer::new(|| {
-		App::new().wrap(Cors::new()).service(
-			web::scope("/users")
-				.route("", web::get().to(user::get::get_all))
-				.route("/{id}", web::get().to(user::get::get)),
-		)
+		App::new()
+			.wrap(Cors::new())
+			.service(
+				web::scope("/users")
+					.route("", web::get().to(user::get::get_all))
+					.route("/{id}", web::get().to(user::get::get)),
+			)
+			.service(web::scope("/search").route("", web::get().to(user::search::search)))
 	})
 	.bind(ADDR)
 	.unwrap()

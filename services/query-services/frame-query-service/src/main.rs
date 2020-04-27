@@ -34,6 +34,7 @@ async fn main() {
 					.route("", web::get().to(frame::get::get_all))
 					.route("/{id}", web::get().to(frame::get::get)),
 			)
+			.service(web::scope("/search").route("", web::get().to(frame::search::search)))
 			.service(web::scope("/users").route(
 				"/{id}/frames",
 				web::get().to(frame::get::get_list_by_owner_id),
