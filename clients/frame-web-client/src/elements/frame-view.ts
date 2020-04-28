@@ -63,7 +63,7 @@ export class FrameView extends LitElement {
 		super.connectedCallback();
 
 		//redispatch anchor click event as navigate event to pass shadow boundary;
-		this.shadowRoot!.addEventListener("click", e => {
+		this.shadowRoot!.addEventListener("click", (e) => {
 			if (!(e.target instanceof HTMLAnchorElement)) return;
 
 			const elementName = e.target.dataset.elementName;
@@ -91,7 +91,7 @@ export class FrameView extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>
+				<h2>
 					عینک
 					<a
 						href="/order/place?frameId=${this.entityId}"
@@ -100,13 +100,11 @@ export class FrameView extends LitElement {
 						<box-icon color="currentColor" name="cart"></box-icon>
 						سفارش
 					</a>
-				</h1>
+				</h2>
 
 				<section>
 					${this.model.coverImage
-						? html`
-								<img src="${this.model.coverImage}" />
-						  `
+						? html` <img src="${this.model.coverImage}" /> `
 						: null}
 					<dl>
 						<dt>برند</dt>

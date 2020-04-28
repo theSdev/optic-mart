@@ -75,7 +75,7 @@ export class OrderIndex extends LitElement {
 
 	render() {
 		return html`
-			<h1>سفارشات دریافت شده</h1>
+			<h2>سفارشات دریافت شده</h2>
 
 			<table>
 				<thead>

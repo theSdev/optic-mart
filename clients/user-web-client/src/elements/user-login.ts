@@ -31,7 +31,7 @@ export class UserLogin extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>ورود</h1>
+				<h2>ورود</h2>
 
 				<form @submit="${this.login}">
 					<fieldset>

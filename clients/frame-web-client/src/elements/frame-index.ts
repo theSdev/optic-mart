@@ -33,7 +33,7 @@ export class FrameIndex extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>عینک</h1>
+				<h2>عینک</h2>
 
 				<section>
 					<a href="/frame/create" data-element-name="frame-create">

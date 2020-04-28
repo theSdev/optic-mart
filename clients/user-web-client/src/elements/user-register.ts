@@ -27,7 +27,7 @@ export class UserRegister extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>ثبت نام</h1>
+				<h2>ثبت نام</h2>
 
 				<form @submit="${this.register}">
 					<fieldset>

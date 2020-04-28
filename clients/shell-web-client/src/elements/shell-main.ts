@@ -64,6 +64,7 @@ export class ShellMain extends LitElement {
 	];
 
 	loggedInUsername: string | null = null;
+	loggedInUserId: string | null = null;
 
 	tryAnchorNavigate(e: Event) {
 		if (!(e.target instanceof HTMLAnchorElement)) return;
@@ -108,7 +109,9 @@ export class ShellMain extends LitElement {
 		const token = localStorage.getItem("bearer");
 		if (token) {
 			try {
-				this.loggedInUsername = parseJwt(token).sub;
+				const parsedToken = parseJwt(token);
+				this.loggedInUserId = parsedToken.id;
+				this.loggedInUsername = parsedToken.sub;
 			} catch (e) {
 				console.error(e);
 			}
@@ -152,6 +155,18 @@ export class ShellMain extends LitElement {
 								</a>
 						  `
 						: html`
+								<a
+									href="/user/view?id=${this.loggedInUserId}"
+									data-element-name="user-view"
+								>
+									<box-icon
+										color="currentColor"
+										type="solid"
+										name="user"
+									></box-icon>
+									<span>${this.loggedInUsername}</span>
+								</a>
+
 								<a href="/user/logout" @click=${this.logout}>
 									<box-icon
 										color="currentColor"
