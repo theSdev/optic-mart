@@ -74,6 +74,8 @@ export class UserList extends LitElement {
 		return html`
 			<article>
 				<h2>کاربران</h2>
+			<fieldset>
+				<legend>کاربران</legend>
 
 				<div>
 					${this.users.map(
