@@ -1,13 +1,12 @@
 import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
-import { config } from "../../package.json";
 
 @customElement("user-list")
 export class UserList extends LitElement {
 	static styles = [
 		commonStyles,
 		css`
-			fieldset > div {
+			article > div {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: 24px;

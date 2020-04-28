@@ -7,7 +7,7 @@ export class FrameList extends LitElement {
 	static styles = [
 		commonStyles,
 		css`
-			fieldset > div {
+			article > div {
 				display: grid;
 				grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 				gap: 24px;
