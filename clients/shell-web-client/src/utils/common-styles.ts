@@ -12,7 +12,8 @@ export default css`
 		color: var(--first-color);
 	}
 
-	.primary {
+	.primary,
+	[type="submit"] {
 		background-color: var(--first-color);
 		color: var(--fourth-color);
 	}
@@ -41,5 +42,12 @@ export default css`
 
 	h1 {
 		margin: 0;
+	}
+
+	input {
+		border: 1px currentColor solid;
+		height: 2.5ex;
+		box-sizing: content-box;
+		padding: 1ex;
 	}
 `;

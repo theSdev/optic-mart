@@ -1,7 +1,7 @@
 import { css } from "lit-element";
 
 export default css`
-	:host {
+	:host:not([hidden]) {
 		display: block;
 	}
 

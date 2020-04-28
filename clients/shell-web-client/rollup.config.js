@@ -38,7 +38,16 @@ export default [
 		output: {
 			file: "dist/elements/shell-main.js",
 			format: "iife",
-			name: "ShellModule",
+			name: "ShellMain",
+		},
+		plugins,
+	},
+	{
+		input: "src/elements/shell-welcome.ts",
+		output: {
+			file: "dist/elements/shell-welcome.js",
+			format: "iife",
+			name: "ShellWelcome",
 		},
 		plugins,
 	},

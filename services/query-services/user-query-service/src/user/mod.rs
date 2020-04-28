@@ -3,6 +3,7 @@ use regex::Regex;
 use serde::Serialize;
 
 pub mod get;
+pub mod search;
 
 //#region User
 

@@ -71,4 +71,13 @@ export default [
 		},
 		plugins,
 	},
+	{
+		input: "src/elements/frame-search.ts",
+		output: {
+			file: "dist/elements/frame-search.js",
+			format: "iife",
+			name: "FrameSearch",
+		},
+		plugins,
+	},
 ];

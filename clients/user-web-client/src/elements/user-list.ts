@@ -2,8 +2,8 @@ import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
 import { config } from "../../package.json";
 
-@customElement("frame-list")
-export class FrameList extends LitElement {
+@customElement("user-list")
+export class UserList extends LitElement {
 	static styles = [
 		commonStyles,
 		css`
@@ -34,34 +34,13 @@ export class FrameList extends LitElement {
 		`,
 	];
 
-	@property({ type: String }) userId = "";
-
 	@property({ type: Array })
-	frames = new Array<{
+	users = new Array<{
 		id: string;
-		brandName: string;
-		colors: Array<string>;
-		coverImage: string;
-		description: string;
-		hasCase: boolean;
-		materials: Array<string>;
-		modelName: string;
-		otherImages: Array<string>;
-		price: number;
-		privacyMode: number;
+		name: string;
+		username: string;
+		email: string;
 	}>();
-
-	async getFrames() {
-		if (!this.userId) return;
-    
-		const response = await fetch(
-			`${config.queryAddress}/users/${this.userId}/frames`,
-			{
-				method: "GET",
-			}
-		);
-		this.frames = await response.json();
-	}
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -85,39 +64,34 @@ export class FrameList extends LitElement {
 				})
 			);
 		});
-
-		if (this.userId) {
-			setTimeout(this.getFrames, 500);
-		}
 	}
 
 	shouldUpdate(changedProperties: Map<string | number | symbol, unknown>) {
-		if (changedProperties.has("userId")) {
-			this.getFrames();
-		}
 		return super.shouldUpdate(changedProperties);
 	}
 
 	render() {
 		return html`
 			<fieldset>
-				<legend>عینک ها</legend>
+				<legend>کاربران</legend>
 
 				<div>
-					${this.frames.map(
-						(frame) =>
+					${this.users.map(
+						(user) =>
 							html`
 								<section>
 									<a
-										href="/frame/view?id=${frame.id}"
-										data-element-name="frame-view"
+										href="/user/view?id=${user.id}"
+										data-element-name="user-view"
 									>
-										${frame.coverImage
-											? html` <img src="${frame.coverImage}" /> `
-											: html` <img /> `}
-										<span>${frame.brandName}</span>
-										<span>${frame.modelName}</span>
-										<span>${frame.price}</span>
+										<dl>
+											<dt>نام</dt>
+											<dd>${user.name}</dd>
+											<dt>نام کاربری</dt>
+											<dd>${user.username}</dd>
+											<dt>ایمیل</dt>
+											<dd>${user.email}</dd>
+										</dl>
 									</a>
 								</section>
 							`

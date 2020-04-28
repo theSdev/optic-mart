@@ -122,19 +122,19 @@ export class ShellMain extends LitElement {
 
 	currentUrlNavigate() {
 		const currentURL = new URL(window.location.href);
-		if (currentURL.pathname.length <= 1) return;
+		if (currentURL.pathname.length <= 1) {
+			ShellMain.navigate("shell-welcome", "/", false);
+			return;
+		}
 
-		const elementName = currentURL.pathname
-			.split("/")
-			.splice(1, 2)
-			.join("-");
+		const elementName = currentURL.pathname.split("/").splice(1, 2).join("-");
 		ShellMain.navigate(elementName, currentURL.href, false);
 	}
 
 	render() {
 		return html`
 			<header class="primary">
-				<h1>اپتیک مارت</h1>
+				<h1><a href="/" data-element-name="shell-main">اپتیک مارت</a></h1>
 				<nav>
 					${!this.loggedInUsername
 						? html`

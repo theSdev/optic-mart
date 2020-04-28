@@ -36,6 +36,15 @@ const plugins = [
 
 export default [
 	{
+		input: "src/elements/user-list.ts",
+		output: {
+			file: "dist/elements/user-list.js",
+			format: "iife",
+			name: "UserList",
+		},
+		plugins,
+	},
+	{
 		input: "src/elements/user-login.ts",
 		output: {
 			file: "dist/elements/user-login.js",
@@ -59,6 +68,15 @@ export default [
 			file: "dist/elements/user-view.js",
 			format: "iife",
 			name: "UserView",
+		},
+		plugins,
+	},
+	{
+		input: "src/elements/user-search.ts",
+		output: {
+			file: "dist/elements/user-search.js",
+			format: "iife",
+			name: "UserSearch",
 		},
 		plugins,
 	},
