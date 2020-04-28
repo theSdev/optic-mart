@@ -53,7 +53,7 @@ export class FrameList extends LitElement {
 
 	async getFrames() {
 		if (!this.userId) return;
-
+    
 		const response = await fetch(
 			`${config.queryAddress}/users/${this.userId}/frames`,
 			{
