@@ -47,7 +47,7 @@ export class OrderPlace extends LitElement {
 		super.connectedCallback();
 
 		//redispatch anchor click event as navigate event to pass shadow boundary;
-		this.shadowRoot!.addEventListener("click", e => {
+		this.shadowRoot!.addEventListener("click", (e) => {
 			if (!(e.target instanceof HTMLAnchorElement)) return;
 
 			const elementName = e.target.dataset.elementName;
@@ -76,7 +76,7 @@ export class OrderPlace extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>سفارش ${this.frameName}</h1>
+				<h2>سفارش ${this.frameName}</h2>
 
 				<form @submit="${this.create}">
 					<fieldset>
@@ -105,10 +105,8 @@ export class OrderPlace extends LitElement {
 								>
 									<option value="${null}">بدون مقدار</option>
 									${this.colors.map(
-										color =>
-											html`
-												<option value="${color}">${color}</option>
-											`
+										(color) =>
+											html` <option value="${color}">${color}</option> `
 									)}
 								</select>
 							</label>

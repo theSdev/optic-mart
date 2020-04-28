@@ -49,7 +49,7 @@ export class FrameCreate extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>افزودن عینک</h1>
+				<h2>افزودن عینک</h2>
 
 				<form @submit="${this.create}">
 					<fieldset>

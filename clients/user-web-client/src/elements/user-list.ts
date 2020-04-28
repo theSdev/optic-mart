@@ -72,8 +72,8 @@ export class UserList extends LitElement {
 
 	render() {
 		return html`
-			<fieldset>
-				<legend>کاربران</legend>
+			<article>
+				<h2>کاربران</h2>
 
 				<div>
 					${this.users.map(
@@ -97,7 +97,7 @@ export class UserList extends LitElement {
 							`
 					)}
 				</div>
-			</fieldset>
+			</article>
 		`;
 	}
 }

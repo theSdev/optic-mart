@@ -100,8 +100,8 @@ export class FrameList extends LitElement {
 
 	render() {
 		return html`
-			<fieldset>
-				<legend>عینک ها</legend>
+			<article>
+				<h2>عینک ها</h2>
 
 				<div>
 					${this.frames.map(
@@ -123,7 +123,7 @@ export class FrameList extends LitElement {
 							`
 					)}
 				</div>
-			</fieldset>
+			</article>
 		`;
 	}
 }

@@ -95,7 +95,7 @@ export class UserView extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h1>
+				<h2>
 					کاربر
 					${this.loggedInUserId && this.loggedInUserId != this.entityId && false
 						? html`
@@ -105,7 +105,7 @@ export class UserView extends LitElement {
 								</button>
 						  `
 						: null}
-				</h1>
+				</h2>
 
 				<section>
 					<dl>

@@ -49,11 +49,6 @@ export default css`
 		padding: 1em;
 	}
 
-	article h1::before {
-		content: " ";
-		background-color: var(--second-color);
-	}
-
 	button {
 		padding: 0.5em 1em;
 		border: none;
@@ -79,7 +74,7 @@ export default css`
 		grid-gap: 1em;
 	}
 
-	h1 {
+	h2 {
 		margin: 0;
 	}
 
