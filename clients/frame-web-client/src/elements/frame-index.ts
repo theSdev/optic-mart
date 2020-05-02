@@ -1,10 +1,14 @@
 import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
 import { config } from "../../package.json";
+import { parseJwt, initElementIfUninit } from "../utils/helpers";
 
 @customElement("frame-index")
 export class FrameIndex extends LitElement {
 	static styles = [commonStyles, css``];
+
+	@property({ type: String })
+	loggedInUserId: string | null = null;
 
 	connectedCallback() {
 		super.connectedCallback();
@@ -28,6 +32,18 @@ export class FrameIndex extends LitElement {
 				})
 			);
 		});
+		
+		initElementIfUninit("frame-list");
+
+		const token = localStorage.getItem("bearer");
+		if (token) {
+			try {
+				const parsedToken = parseJwt(token);
+				this.loggedInUserId = parsedToken.id;
+			} catch (e) {
+				console.error(e);
+			}
+		}
 	}
 
 	render() {
@@ -41,6 +57,8 @@ export class FrameIndex extends LitElement {
 						<span>افزودن</span>
 					</a>
 				</section>
+
+				<frame-list userId=${this.loggedInUserId}></frame-list>
 			</article>
 		`;
 	}
