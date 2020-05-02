@@ -2,6 +2,7 @@ use chrono::prelude::*;
 use regex::Regex;
 
 pub mod login;
+pub mod modify;
 pub mod register;
 
 //#region User

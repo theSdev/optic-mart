@@ -80,4 +80,13 @@ export default [
 		},
 		plugins,
 	},
+	{
+		input: "src/elements/user-modify.ts",
+		output: {
+			file: "dist/elements/user-modify.js",
+			format: "iife",
+			name: "UserModify",
+		},
+		plugins,
+	},
 ];

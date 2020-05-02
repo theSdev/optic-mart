@@ -97,12 +97,15 @@ export class UserView extends LitElement {
 			<article>
 				<h2>
 					کاربر
-					${this.loggedInUserId && this.loggedInUserId != this.entityId && false
+					${this.loggedInUserId == this.entityId
 						? html`
-								<button class="secondary">
-									<box-icon color="currentColor" name="user-plus"></box-icon>
-									دنبال کردن
-								</button>
+								<a
+									href="/user/modify?id=${this.loggedInUserId}"
+									data-element-name="user-modify"
+									aria-label="ویرایش"
+								>
+									<box-icon color="currentColor" name="pencil"></box-icon>
+								</a>
 						  `
 						: null}
 				</h2>

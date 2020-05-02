@@ -52,9 +52,18 @@ async fn update_users() {
 	let mut user_query_conn = utils::get_user_query_db_connection().unwrap();
 	user_query_conn
 		.execute(
+			r#"CREATE TABLE IF NOT EXISTS "settings" (
+			    updated_at      TIMESTAMP(6) NOT NULL
+			  )"#,
+			&[],
+		)
+		.unwrap();
+
+	user_query_conn
+		.execute(
 			r#"CREATE TABLE IF NOT EXISTS "user" (
 			    id              SERIAL PRIMARY KEY,
-			    entity_id       TEXT NOT NULL,
+			    entity_id       TEXT NOT NULL UNIQUE,
 			    name            TEXT NOT NULL,
 			    start_date      DATE,
 			    address         TEXT,
@@ -79,39 +88,42 @@ async fn update_users() {
 	}
 
 	loop {
-		let read_res = (|| {
-			let tracked_entity_ids = &tracked_users
-				.keys()
-				.into_iter()
-				.map(|s| s.clone())
-				.collect::<Vec<String>>();
-			dbg!(tracked_entity_ids);
+		let recent = tracked_users.iter().max_by(|p, q| p.cmp(q));
+		let updated_at: NaiveDateTime = if let Some(max_pair) = recent {
+			max_pair.1.clone()
+		} else {
+			NaiveDateTime::new(NaiveDate::from_yo(1970, 1), NaiveTime::from_hms(0, 0, 0))
+		};
 
+		let read_res = (|| {
 			let event_rows = &event_store_conn
 				.query(
-					r#"SELECT entity_id, body, inserted_at FROM "user"
-					WHERE type = $1"#,
-					&[&"UserRegistered"],
+					r#"SELECT entity_id, body, inserted_at, type FROM "user"
+					WHERE inserted_at > $1"#,
+					&[&updated_at],
 				)
 				.map_err(|e| e.to_string())?;
 
 			for row in event_rows {
+				let entity_id: String = row.get(0);
+				dbg!(&entity_id);
+
+				let body: String = row.get(1);
+				dbg!(&body);
+
+				let inserted_at: NaiveDateTime = row.get(2);
+				let r#type: String = row.get(3);
+
 				let persist_res = (|| {
-					let entity_id: String = row.get(0);
-					dbg!(&entity_id);
+					match r#type.as_str() {
+						"UserRegistered" => {
+							let body: UserRegisteredData =
+								serde_json::from_str(&body).map_err(|e| e.to_string())?;
 
-					if !tracked_entity_ids.contains(&entity_id) {
-						let body: String = row.get(1);
-						dbg!(&body);
-						let body: UserRegisteredData =
-							serde_json::from_str(&body).map_err(|e| e.to_string())?;
-
-						let inserted_at: NaiveDateTime = row.get(2);
-
-						// Save user in Postgres
-						user_query_conn
-							.execute(
-								r#"INSERT INTO "user"
+							// Save user in Postgres
+							user_query_conn
+								.execute(
+									r#"INSERT INTO "user"
 								(entity_id,
 								name,
 								start_date,
@@ -122,27 +134,63 @@ async fn update_users() {
 								photo,
 								updated_at)
 								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"#,
-								&[
-									&entity_id,
-									&body.name,
-									&body.start_date,
-									&body.address,
-									&body.phone_number,
-									&body.username,
-									&body.email,
-									&body.photo,
-									&inserted_at,
-								],
-							)
-							.map_err(|e| e.to_string())?;
+									&[
+										&entity_id,
+										&body.name,
+										&body.start_date,
+										&body.address,
+										&body.phone_number,
+										&body.username,
+										&body.email,
+										&body.photo,
+										&inserted_at,
+									],
+								)
+								.map_err(|e| e.to_string())?;
 
-						tracked_users.insert(entity_id, inserted_at);
+							Ok::<(), String>(())
+						}
+						"UserModified" => {
+							let body: UserModifiedData =
+								serde_json::from_str(&body).map_err(|e| e.to_string())?;
+
+							// Save user in Postgres
+							user_query_conn
+								.execute(
+									r#"UPDATE "user" SET
+										name = $1,
+										start_date = $2,
+										address = $3,
+										phone_number = $4,
+										username = $5,
+										email = $6,
+										photo = $7,
+										updated_at = $8
+									WHERE id = $9"#,
+									&[
+										&body.name,
+										&body.start_date,
+										&body.address,
+										&body.phone_number,
+										&body.username,
+										&body.email,
+										&body.photo,
+										&inserted_at,
+										&entity_id,
+									],
+								)
+								.map_err(|e| e.to_string())?;
+
+							Ok::<(), String>(())
+						}
+						_ => Err("Unknown event".to_string()),
 					}
-					Ok::<(), String>(())
 				})();
 
 				if persist_res.is_err() {
 					dbg!(persist_res.unwrap_err());
+				} else {
+					tracked_users.insert(entity_id, inserted_at);
 				}
 			}
 

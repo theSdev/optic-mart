@@ -11,24 +11,6 @@
     },
     {
       "path": "clients/order-web-client"
-    },
-    {
-      "path": "services/command-services/frame-command-service"
-    },
-    {
-      "path": "services/command-services/order-command-service"
-    },
-    {
-      "path": "services/command-services/user-command-service"
-    },
-    {
-      "path": "services/query-services/frame-query-service"
-    },
-    {
-      "path": "services/query-services/order-query-service"
-    },
-    {
-      "path": "services/query-services/user-query-service"
     }
   ],
   "settings": {}

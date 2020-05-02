@@ -23,6 +23,7 @@ fn main() {
 		App::new().wrap(Cors::new()).service(
 			web::scope("/users")
 				.route("", web::post().to(user::register::register))
+				.route("/{id}", web::put().to(user::modify::modify))
 				.route("/{username}/tokens", web::post().to(user::login::login)),
 		)
 	})
