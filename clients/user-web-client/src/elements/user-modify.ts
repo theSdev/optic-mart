@@ -82,7 +82,7 @@ export class UserModify extends LitElement {
 	render() {
 		return html`
 			<article>
-				<h2>ثبت نام</h2>
+				<h2>ویرایش کاربر</h2>
 
 				<form @submit="${this.modify}">
 					<fieldset>

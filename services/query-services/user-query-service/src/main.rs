@@ -95,6 +95,8 @@ async fn update_users() {
 			NaiveDateTime::new(NaiveDate::from_yo(1970, 1), NaiveTime::from_hms(0, 0, 0))
 		};
 
+		dbg!(&updated_at);
+
 		let read_res = (|| {
 			let event_rows = &event_store_conn
 				.query(
@@ -112,7 +114,10 @@ async fn update_users() {
 				dbg!(&body);
 
 				let inserted_at: NaiveDateTime = row.get(2);
+				dbg!(&inserted_at);
+
 				let r#type: String = row.get(3);
+				dbg!(&r#type);
 
 				let persist_res = (|| {
 					match r#type.as_str() {
@@ -166,7 +171,7 @@ async fn update_users() {
 										email = $6,
 										photo = $7,
 										updated_at = $8
-									WHERE id = $9"#,
+									WHERE entity_id = $9"#,
 									&[
 										&body.name,
 										&body.start_date,
@@ -183,15 +188,16 @@ async fn update_users() {
 
 							Ok::<(), String>(())
 						}
-						_ => Err("Unknown event".to_string()),
+						other => {
+							println!("Unknown event type {}", other);
+
+							Ok::<(), String>(())
+						}
 					}
 				})();
 
-				if persist_res.is_err() {
-					dbg!(persist_res.unwrap_err());
-				} else {
-					tracked_users.insert(entity_id, inserted_at);
-				}
+				persist_res.unwrap();
+				tracked_users.insert(entity_id, inserted_at);
 			}
 
 			Ok::<(), String>(())
@@ -202,11 +208,5 @@ async fn update_users() {
 		}
 
 		thread::sleep(Duration::from_secs(30));
-
-		/*
-			let t = &"2019-11-30 08:20:14.210265"[..19];
-			let a = Utc.datetime_from_str(t, "%Y-%m-%d %H:%M:%S");
-			println!("{:?}", a);
-		*/
 	}
 }
