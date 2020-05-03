@@ -88,7 +88,7 @@ async fn update_users() {
 	}
 
 	loop {
-		let recent = tracked_users.iter().max_by(|p, q| p.cmp(q));
+		let recent = tracked_users.iter().max_by(|p, q| p.1.cmp(q.1));
 		let updated_at: NaiveDateTime = if let Some(max_pair) = recent {
 			max_pair.1.clone()
 		} else {
