@@ -23,9 +23,14 @@ export class UserLogin extends LitElement {
 				method: "POST",
 			}
 		);
+		if(response.status < 400) {
 		const token = await response.text();
 		localStorage.setItem("bearer", token);
 		window.location.href = "/";
+		} else {
+			this.shadowRoot!.querySelector("form")!.reset();
+			(this.shadowRoot!.querySelector("form input:first-of-type") as HTMLInputElement).focus();
+		}
 	}
 
 	render() {
