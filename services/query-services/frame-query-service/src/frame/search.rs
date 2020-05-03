@@ -34,7 +34,8 @@ pub fn search(info: web::Query<Info>) -> Result<HttpResponse, actix_web::Error> 
 				OR colors LIKE $1 
 				OR description LIKE $1 
 				OR materials LIKE $1 
-				OR model_name LIKE $1 "#,
+				OR model_name LIKE $1
+			OFFSET 0 FETCH FIRST 5 ROWS ONLY"#,
 			&[&(term.to_owned() + &"%".to_owned())],
 		)
 		.map_err(|e| error::ErrorInternalServerError(e))?;

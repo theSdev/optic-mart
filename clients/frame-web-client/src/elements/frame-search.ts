@@ -26,11 +26,6 @@ export class FrameSearch extends LitElement {
 	}>();
 
 	async searchFrames() {
-		if (!this.term) {
-			this.frames = [];
-			return;
-		}
-
 		const response = await fetch(
 			`${config.queryAddress}/search?term=${this.term}`,
 			{

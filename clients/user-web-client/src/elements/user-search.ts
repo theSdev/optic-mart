@@ -19,11 +19,6 @@ export class UserSearch extends LitElement {
 	}>();
 
 	async searchUsers() {
-		if (!this.term) {
-			this.users = [];
-			return;
-		}
-
 		const response = await fetch(
 			`${config.queryAddress}/search?term=${this.term}`,
 			{

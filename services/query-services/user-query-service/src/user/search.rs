@@ -29,8 +29,9 @@ pub fn search(info: web::Query<Info>) -> Result<HttpResponse, actix_web::Error> 
 			WHERE name LIKE $1
 				OR address LIKE $1
 				OR phone_number LIKE $1
-				OR username LIKE $1 "#,
-			&[&term],
+				OR username LIKE $1
+			OFFSET 0 FETCH FIRST 5 ROWS ONLY"#,
+			&[&(term.to_owned() + &"%".to_owned())],
 		)
 		.map_err(|e| error::ErrorInternalServerError(e))?;
 
