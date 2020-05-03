@@ -1,6 +1,7 @@
 import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
 import { config } from "../../package.json";
+import { parseJwt } from "../utils/helpers";
 
 @customElement("frame-view")
 export class FrameView extends LitElement {
@@ -13,11 +14,15 @@ export class FrameView extends LitElement {
 		materials: new Array<string>(),
 		modelName: "",
 		otherImages: new Array<string>(),
+		ownerId: "",
 		price: 0,
 		privacyMode: 1,
 	};
 
 	entityId: string | null = null;
+
+	@property({type: String})
+	loggedInUserId: string | null = null;
 
 	static styles = [
 		commonStyles,
@@ -81,9 +86,18 @@ export class FrameView extends LitElement {
 				})
 			);
 		});
+
+		const token = localStorage.getItem("bearer");
+		if (token) {
+			try {
+				this.loggedInUserId = parseJwt(token).id;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+
 		setTimeout(() => {
 			this.entityId = new URL(window.location.href).searchParams.get("id");
-
 			this.getFrame();
 		});
 	}
@@ -93,13 +107,17 @@ export class FrameView extends LitElement {
 			<article>
 				<h2>
 					عینک
-					<a
-						href="/order/place?frameId=${this.entityId}"
-						data-element-name="order-place"
-					>
-						<box-icon color="currentColor" name="cart"></box-icon>
-						سفارش
-					</a>
+					${this.loggedInUserId != this.model.ownerId
+						? html`
+								<a
+									href="/order/place?frameId=${this.entityId}"
+									data-element-name="order-place"
+									aria-label="سفارش"
+								>
+									<box-icon color="currentColor" name="cart"></box-icon>
+								</a>
+							`
+						: null}
 				</h2>
 
 				<section>
