@@ -13,15 +13,23 @@ export class UserList extends LitElement {
 			}
 
 			section > a {
+				width: 100%;
+				text-decoration: none !important;
+			}
+
+			section > a > dl {
 				display: grid;
 				grid-template-columns: auto 1fr;
 				grid-template-rows: 1fr 1fr 1fr;
-				grid-auto-flow: column;
 				border: 1px black solid;
 				padding: 24px;
 				column-gap: 24px;
 				row-gap: 8px;
-				text-decoration: none !important;
+				width: 100%;
+			}
+			
+			dd, dt {
+				margin: 0;
 			}
 
 			img {
@@ -73,8 +81,6 @@ export class UserList extends LitElement {
 		return html`
 			<article>
 				<h2>کاربران</h2>
-			<fieldset>
-				<legend>کاربران</legend>
 
 				<div>
 					${this.users.map(
