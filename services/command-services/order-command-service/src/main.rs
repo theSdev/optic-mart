@@ -20,7 +20,9 @@ fn main() {
 	HttpServer::new(|| {
 		App::new()
 			.wrap(Cors::new())
-			.service(web::scope("/orders").route("", web::post().to(order::place::place)))
+			.service(web::scope("/orders")
+			.route("", web::post().to(order::place::place))
+			.route("/{id}", web::put().to(order::mark::mark)))
 	})
 	.bind(ADDR)
 	.unwrap()

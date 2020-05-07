@@ -29,10 +29,7 @@ async fn main() {
 	HttpServer::new(|| {
 		App::new()
 			.wrap(Cors::new())
-			.service(
-				web::scope("/orders")
-					.route("", web::get().to(order::get::get_received)),
-			)
+			.service(web::scope("/orders").route("", web::get().to(order::get::get_received)))
 	})
 	.bind(ADDR)
 	.unwrap()
@@ -59,57 +56,67 @@ async fn update_orders() {
 			    frame_id        TEXT NOT NULL,
 			    owner_id        TEXT NOT NULL,
 			    quantity        INT,
-			    total           REAL,
+				total           REAL,
+				processed		BOOLEAN NOT NULL DEFAULT FALSE,
+				rejected		BOOLEAN NOT NULL DEFAULT FALSE,
 			    updated_at      TIMESTAMP(6) NOT NULL
 			  )"#,
 			&[],
 		)
 		.unwrap();
 
-	let user_rows = &order_query_conn
+	let order_rows = &order_query_conn
 		.query(r#"SELECT entity_id, updated_at FROM "order""#, &[])
 		.unwrap();
 
-	for row in user_rows {
-		let user_id = row.get(0);
+	for row in order_rows {
+		let order_id = row.get(0);
 		let updated_at: NaiveDateTime = row.get(1);
-		tracked_orders.insert(user_id, updated_at);
+		tracked_orders.insert(order_id, updated_at);
 	}
 
 	loop {
-		let read_res = (|| {
-			let tracked_entity_ids = &tracked_orders
-				.keys()
-				.into_iter()
-				.map(|s| s.clone())
-				.collect::<Vec<String>>();
-			dbg!(tracked_entity_ids);
+		let recent = tracked_orders.iter().max_by(|p, q| p.1.cmp(q.1));
+		let updated_at: NaiveDateTime = if let Some(max_pair) = recent {
+			max_pair.1.clone()
+		} else {
+			NaiveDateTime::new(NaiveDate::from_yo(1970, 1), NaiveTime::from_hms(0, 0, 0))
+		};
 
+		dbg!(&updated_at);
+
+		let read_res = (|| {
 			let event_rows = &event_store_conn
 				.query(
-					r#"SELECT entity_id, body, inserted_at FROM "order"
-					WHERE type = $1"#,
-					&[&"OrderPlaced"],
+					r#"SELECT entity_id, body, inserted_at, type FROM "order"
+					WHERE inserted_at > $1"#,
+					&[&updated_at],
 				)
 				.map_err(|e| e.to_string())?;
 
 			for row in event_rows {
+				let entity_id: String = row.get(0);
+				dbg!(&entity_id);
+
+				let body: String = row.get(1);
+				dbg!(&body);
+
+				let inserted_at: NaiveDateTime = row.get(2);
+				dbg!(&inserted_at);
+
+				let r#type: String = row.get(3);
+				dbg!(&r#type);
+
 				let persist_res = (|| {
-					let entity_id: String = row.get(0);
-					dbg!(&entity_id);
+					match r#type.as_str() {
+						"OrderPlaced" => {
+							let body: OrderPlacedData =
+								serde_json::from_str(&body).map_err(|e| e.to_string())?;
 
-					if !tracked_entity_ids.contains(&entity_id) {
-						let body: String = row.get(1);
-						dbg!(&body);
-						let body: OrderPlacedData =
-							serde_json::from_str(&body).map_err(|e| e.to_string())?;
-
-						let inserted_at: NaiveDateTime = row.get(2);
-
-						// Save order in Postgres
-						order_query_conn
-							.execute(
-								r#"INSERT INTO "order"
+							// Save order in Postgres
+							order_query_conn
+								.execute(
+									r#"INSERT INTO "order"
 								(entity_id,
 								customer_id,
 								date,
@@ -120,28 +127,62 @@ async fn update_orders() {
 								total,
 								updated_at)
 								VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)"#,
-								&[
-									&entity_id,
-									&body.customer_id,
-									&body.date,
-									&body.frame_color,
-									&body.frame_id,
-									&body.owner_id,
-									&body.quantity,
-									&body.total,
-									&inserted_at,
-								],
-							)
-							.map_err(|e| e.to_string())?;
+									&[
+										&entity_id,
+										&body.customer_id,
+										&body.date,
+										&body.frame_color,
+										&body.frame_id,
+										&body.owner_id,
+										&body.quantity,
+										&body.total,
+										&inserted_at,
+									],
+								)
+								.map_err(|e| e.to_string())?;
 
-						tracked_orders.insert(entity_id, inserted_at);
+							Ok::<(), String>(())
+						}
+						"OrderProcessed" => {
+							order_query_conn
+								.execute(
+									r#"UPDATE "order" SET
+									processed = $1,
+									rejected = $2,
+									updated_at = $3
+								WHERE entity_id = $4
+							"#,
+									&[&true, &false, &inserted_at, &entity_id],
+								)
+								.map_err(|e| e.to_string())?;
+
+							Ok::<(), String>(())
+						}
+						"OrderRejected" => {
+							order_query_conn
+								.execute(
+									r#"UPDATE "order" SET
+									processed = $1,
+									rejected = $2,
+									updated_at = $3
+								WHERE entity_id = $4
+							"#,
+									&[&false, &true, &inserted_at, &entity_id],
+								)
+								.map_err(|e| e.to_string())?;
+
+							Ok::<(), String>(())
+						}
+						other => {
+							println!("Unknown event type {}", other);
+
+							Ok::<(), String>(())
+						}
 					}
-					Ok::<(), String>(())
 				})();
 
-				if persist_res.is_err() {
-					dbg!(persist_res.unwrap_err());
-				}
+				persist_res.unwrap();
+				tracked_orders.insert(entity_id, inserted_at);
 			}
 
 			Ok::<(), String>(())
@@ -152,11 +193,5 @@ async fn update_orders() {
 		}
 
 		thread::sleep(Duration::from_secs(30));
-
-		/*
-			let t = &"2019-11-30 08:20:14.210265"[..19];
-			let a = Utc.datetime_from_str(t, "%Y-%m-%d %H:%M:%S");
-			println!("{:?}", a);
-		*/
 	}
 }

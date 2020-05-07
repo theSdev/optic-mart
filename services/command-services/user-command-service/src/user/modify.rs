@@ -1,10 +1,11 @@
 use super::User;
 use crate::utils;
-use actix_web::{error, web, HttpResponse};
+use actix_web::{error, web, HttpRequest, HttpResponse};
 use chrono::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::borrow::Borrow;
 use std::convert::TryFrom;
+use utils::Claims;
 
 //#region Event
 
@@ -56,7 +57,6 @@ impl TryFrom<WebModel> for UserModifiedData {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WebModel {
-	id: String,
 	name: String,
 	start_date: Option<DateTime<Utc>>,
 	address: Option<String>,
@@ -66,8 +66,28 @@ pub struct WebModel {
 	photo: Option<String>,
 }
 
-pub fn modify(user_model: web::Json<WebModel>) -> Result<HttpResponse, actix_web::Error> {
-	let id = &user_model.id.clone();
+pub fn modify(
+	req: HttpRequest,
+	user_model: web::Json<WebModel>,
+) -> Result<HttpResponse, actix_web::Error> {
+	let auth_header = req
+		.headers()
+		.get("Authorization")
+		.ok_or(error::ErrorUnauthorized("Auth required."))?
+		.to_str()
+		.map_err(|e| error::ErrorBadRequest(e))?;
+
+	let token = auth_header.replace(&"Bearer", &"");
+	let token = token.as_str().trim();
+
+	let jwt_key = crate::SECRETS
+		.get("jwt_key")
+		.ok_or(error::ErrorInternalServerError("Failed to get jwt_key"))?;
+
+	let token = jwt::decode::<Claims>(token, jwt_key.as_ref(), &jwt::Validation::default())
+		.map_err(|e| error::ErrorBadRequest(e))?;
+
+	let id = token.claims.id.clone();
 
 	// Validate and convert user_model to UserModifiedData.
 	let user = UserModifiedData::try_from(user_model.into_inner())
@@ -80,7 +100,7 @@ pub fn modify(user_model: web::Json<WebModel>) -> Result<HttpResponse, actix_web
 	for row in &user_command_conn
 		.query(
 			r#"SELECT username, email FROM "user" WHERE id <> $1"#,
-			&[id],
+			&[&id],
 		)
 		.map_err(|e| error::ErrorInternalServerError(e))?
 	{

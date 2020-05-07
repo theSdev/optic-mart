@@ -45,7 +45,7 @@ export default css`
 	}
 
 	a,
-	button {
+	button:not([hidden]) {
 		align-items: center;
 		display: inline-flex;
 		justify-content: center;

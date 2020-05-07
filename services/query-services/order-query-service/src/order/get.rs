@@ -10,14 +10,14 @@ pub fn get_received(req: HttpRequest) -> Result<HttpResponse, actix_web::Error> 
 		.ok_or(error::ErrorUnauthorized("Auth required."))?
 		.to_str()
 		.map_err(|e| error::ErrorBadRequest(e))?;
-	
+
 	let token = auth_header.replace(&"Bearer", &"");
 	let token = token.as_str().trim();
-	
+
 	let jwt_key = crate::SECRETS
 		.get("jwt_key")
 		.ok_or(error::ErrorInternalServerError("Failed to get jwt_key"))?;
-	
+
 	let token = jwt::decode::<Claims>(token, jwt_key.as_ref(), &jwt::Validation::default())
 		.map_err(|e| error::ErrorBadRequest(e))?;
 	let owner_id = token.claims.id;
@@ -35,6 +35,8 @@ pub fn get_received(req: HttpRequest) -> Result<HttpResponse, actix_web::Error> 
 				owner_id,
 				quantity,
 				total,
+				processed,
+				rejected,
 				updated_at
 				FROM "order"
 				WHERE owner_id = $1"#,
@@ -54,6 +56,8 @@ pub fn get_received(req: HttpRequest) -> Result<HttpResponse, actix_web::Error> 
 			owner_id: stored_order.get(5),
 			quantity: stored_order.get(6),
 			total: stored_order.get(7),
+			processed: stored_order.get(8),
+			rejected: stored_order.get(9),
 		};
 
 		orders.push(order);

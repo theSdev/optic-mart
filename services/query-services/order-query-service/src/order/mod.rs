@@ -16,6 +16,8 @@ pub struct Order {
 	owner_id: String,
 	quantity: i32,
 	total: f32,
+	processed: bool,
+	rejected: bool,
 }
 
 //#endregion

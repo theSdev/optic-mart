@@ -52,15 +52,6 @@ async fn update_users() {
 	let mut user_query_conn = utils::get_user_query_db_connection().unwrap();
 	user_query_conn
 		.execute(
-			r#"CREATE TABLE IF NOT EXISTS "settings" (
-			    updated_at      TIMESTAMP(6) NOT NULL
-			  )"#,
-			&[],
-		)
-		.unwrap();
-
-	user_query_conn
-		.execute(
 			r#"CREATE TABLE IF NOT EXISTS "user" (
 			    id              SERIAL PRIMARY KEY,
 			    entity_id       TEXT NOT NULL UNIQUE,

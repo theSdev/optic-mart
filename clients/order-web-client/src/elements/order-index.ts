@@ -2,11 +2,26 @@ import { LitElement, html, property, customElement, css } from "lit-element";
 import commonStyles from "../utils/common-styles";
 import { config } from "../../package.json";
 
+enum Flag {
+	Processed = "processed",
+	Rejected = "rejected",
+}
+
+enum Type {
+	New = "new",
+	Processed = "processed",
+	Rejected = "rejected",
+}
+
 @customElement("order-index")
 export class OrderIndex extends LitElement {
 	static styles = [
 		commonStyles,
 		css`
+			article > div {
+				overflow-x: auto;
+			}
+
 			table {
 				border-collapse: collapse;
 				table-layout: fixed;
@@ -14,6 +29,7 @@ export class OrderIndex extends LitElement {
 				width: calc(100% - 32px);
 				box-sizing: border-box;
 				margin: 16px;
+				min-width: 400px;
 			}
 
 			th,
@@ -26,6 +42,8 @@ export class OrderIndex extends LitElement {
 
 	@property({ type: String }) userId = "";
 
+	@property({ type: String }) type = Type.New;
+
 	@property({ type: Array })
 	orders = new Array<{
 		id: string;
@@ -34,6 +52,8 @@ export class OrderIndex extends LitElement {
 		frameId: string;
 		quantity: number;
 		total: number;
+		processed: boolean;
+		rejected: boolean;
 	}>();
 
 	async getOrders() {
@@ -47,11 +67,29 @@ export class OrderIndex extends LitElement {
 		this.orders = await response.json();
 	}
 
+	async flag(entityId: string, flag: Flag) {
+		const response = await fetch(
+			`${config.serviceAddress}/orders/${entityId}`,
+			{
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("bearer")}`,
+					"Content-Type": "application/json",
+				},
+				method: "PUT",
+				body: JSON.stringify({
+					processed: flag == Flag.Processed,
+					rejected: flag == Flag.Rejected,
+				}),
+			}
+		);
+		this.orders = await response.json();
+	}
+
 	connectedCallback() {
 		super.connectedCallback();
 
 		//redispatch anchor click event as navigate event to pass shadow boundary;
-		this.shadowRoot!.addEventListener("click", e => {
+		this.shadowRoot!.addEventListener("click", (e) => {
 			if (!(e.target instanceof HTMLAnchorElement)) return;
 
 			const elementName = e.target.dataset.elementName;
@@ -75,44 +113,104 @@ export class OrderIndex extends LitElement {
 
 	render() {
 		return html`
-			<h2>سفارشات دریافت شده</h2>
+			<article>
+				<h2>سفارشات دریافت شده</h2>
 
-			<table>
-				<thead>
-					<tr>
-						<th>فریم</th>
-						<th>سفارش دهنده</th>
-						<th>رنگ</th>
-						<th>تعداد</th>
-						<th>مجموع</th>
-					</tr>
-				</thead>
-				<tbody>
-					${this.orders.map(
-						order => html`
+				<form>
+					<fieldset>
+						<legend>فیلتر</legend>
+
+						<div>
+							<label>
+								نوع
+								<select
+									@input="${(e: Event) =>
+										(this.type = <Type>(e.target as HTMLSelectElement).value)}"
+								>
+									<option value="${Type.New}">جدید</option>
+									<option value="${Type.Processed}">پردازش شده</option>
+									<option value="${Type.Rejected}">رد شده</option>
+								</select>
+							</label>
+						</div>
+					</fieldset>
+				</form>
+
+				<div>
+					<table>
+						<thead>
 							<tr>
-								<td>
-									<a
-										href="/frame/view?id=${order.frameId}"
-										data-element-name="frame-view"
-										>فریم</a
-									>
-								</td>
-								<td>
-									<a
-										href="/user/view?id=${order.customerId}"
-										data-element-name="user-view"
-										>سفارش دهنده</a
-									>
-								</td>
-								<td>${order.frameColor}</td>
-								<td>${order.quantity}</td>
-								<td>${order.total}</td>
+								<th>فریم</th>
+								<th>سفارش دهنده</th>
+								<th>رنگ</th>
+								<th>تعداد</th>
+								<th>مجموع</th>
+								<th>عملیات</th>
 							</tr>
-						`
-					)}
-				</tbody>
-			</table>
+						</thead>
+						<tbody>
+							${this.orders
+								.filter((o) =>
+									this.type == Type.Rejected
+										? o.rejected
+										: this.type == Type.Processed
+										? o.processed
+										: !o.processed && !o.rejected
+								)
+								.map(
+									(order) => html`
+										<tr>
+											<td>
+												<a
+													href="/frame/view?id=${order.frameId}"
+													data-element-name="frame-view"
+													>فریم</a
+												>
+											</td>
+											<td>
+												<a
+													href="/user/view?id=${order.customerId}"
+													data-element-name="user-view"
+													>سفارش دهنده</a
+												>
+											</td>
+											<td>${order.frameColor}</td>
+											<td>${order.quantity}</td>
+											<td>${order.total}</td>
+											<td>
+												<button
+													type="button"
+													@click=${() => this.flag(order.id, Flag.Processed)}
+													?hidden=${this.type == Type.Processed}
+												>
+													<box-icon
+														color="limegreen"
+														name="check"
+														aria-label="تعیین به عنوان پردازش شده"
+														title="تعیین به عنوان پردازش شده"
+													></box-icon>
+												</button>
+
+												<button
+													type="button"
+													@click=${() => this.flag(order.id, Flag.Rejected)}
+													?hidden=${this.type == Type.Rejected}
+												>
+													<box-icon
+														color="tomato"
+														name="x"
+														aria-label="رد"
+														title="رد"
+													></box-icon>
+												</button>
+											</td>
+										</tr>
+									`
+								)}
+						</tbody>
+					</table>
+				</div>
+			</article>
 		`;
 	}
 }

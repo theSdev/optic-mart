@@ -62,6 +62,7 @@ pub async fn place_async(
 	req: HttpRequest,
 	mut order_model: web::Json<WebModel>,
 ) -> Result<HttpResponse, actix_web::Error> {
+	// Auth
 	let auth_header = req
 		.headers()
 		.get("Authorization")
@@ -79,7 +80,8 @@ pub async fn place_async(
 	let token = jwt::decode::<Claims>(token, jwt_key.as_ref(), &jwt::Validation::default())
 		.map_err(|e| error::ErrorBadRequest(e))?;
 	order_model.customer_id = Some(token.claims.id);
-	
+
+	// Get frame
 	let frame_query_service_address = crate::SECRETS.get("frame_query_service_address")
 		.ok_or(error::ErrorInternalServerError("Failed to get frame_query_service_address"))?;
 	let mut response = surf::get(format!("{}/frames/{}", frame_query_service_address, order_model.frame_id))
@@ -91,11 +93,33 @@ pub async fn place_async(
 	order_model.owner_id = Some(owner_id);
 	order_model.total = Some(order_model.quantity as f32 * price);
 	
-	// Validate and convert order_model to UserRegisteredData.
+	// Validate and convert order_model to OrderPlacedData.
 	let order = OrderPlacedData::try_from(order_model.into_inner())
 		.map_err(|e| error::ErrorBadRequest(e))?;
 
 	let order_id = generate_uuid();
+
+	// Save in order_command db before event_store for future checks
+	let order_command_conn =
+		utils::get_order_command_db_connection().map_err(|e| error::ErrorInternalServerError(e))?;
+
+	order_command_conn
+		.execute(
+			r#"CREATE TABLE IF NOT EXISTS "order" (
+				id              TEXT NOT NULL PRIMARY KEY,
+				owner_id        TEXT NOT NULL,
+				customer_id     TEXT NOT NULL
+			  )"#,
+			&[],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
+
+	order_command_conn
+		.execute(
+			r#"INSERT INTO "order" (id, owner_id, customer_id) VALUES ($1, $2, $3)"#,
+			&[&order_id, &order.owner_id, &order.customer_id],
+		)
+		.map_err(|e| error::ErrorInternalServerError(e))?;
 
 	// Persist to Event Store.
 	let event_data = &OrderPlacedData::from(order);

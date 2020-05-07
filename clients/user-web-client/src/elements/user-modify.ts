@@ -21,6 +21,7 @@ export class UserModify extends LitElement {
 		fetch(`${config.serviceAddress}/users/${this.model.id}`, {
 			body: JSON.stringify(this.model),
 			headers: {
+				Authorization: `Bearer ${localStorage.getItem("bearer")}`,
 				"Content-Type": "application/json",
 			},
 			method: "PUT",
