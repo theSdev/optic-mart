@@ -86,7 +86,7 @@ export class ShellMain extends LitElement {
 	logout(e: Event) {
 		e.preventDefault();
 		localStorage.removeItem("bearer");
-		window.location.reload();
+		window.location.href = "/";
 	}
 
 	static navigate(elementName: string, href: string, pushState = true) {

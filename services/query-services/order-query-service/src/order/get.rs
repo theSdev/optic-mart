@@ -39,7 +39,8 @@ pub fn get_received(req: HttpRequest) -> Result<HttpResponse, actix_web::Error> 
 				rejected,
 				updated_at
 				FROM "order"
-				WHERE owner_id = $1"#,
+			WHERE owner_id = $1
+				OR customer_id = $1"#,
 			&[&owner_id],
 		)
 		.map_err(|e| error::ErrorInternalServerError(e))?;
